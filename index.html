@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Cine Mega App</title>
+    <title>Cine Mega VOD</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body oncontextmenu="return false">
 
-    <header class="app-header">
-        <div class="logo">CINE MEGA</div>
-        <div onclick="ir('buscaPage')"><i class="fa fa-search" style="font-size:20px;"></i></div>
-    </header>
-
     <div id="home" class="page active">
-        <div id="hero-slider" class="hero-slider"></div>
-        <div class="hero-dots" id="hero-dots"></div>
+        <div class="hero-container">
+            <div class="hero-dots" id="hero-dots"></div>
+            <div id="hero-wrapper"></div>
+        </div>
 
         <div class="secao">
             <h2>🔥 TOP 10 SEMANA</h2>
@@ -24,40 +21,50 @@
         </div>
 
         <div class="secao">
-            <div style="display:flex; justify-content:space-between; padding-right:20px;">
-                <h2>📅 VAI ESTREAR</h2>
-                <i class="fa fa-chevron-right"></i>
-            </div>
+            <h2>📅 VAI ESTREAR (JUN/JUL)</h2>
             <div id="estreias" class="row"></div>
+        </div>
+
+        <div class="secao">
+            <div style="display:flex; justify-content:space-between; padding-right:20px;">
+                <h2>💀 BAÚ DO TRASH (80-95)</h2>
+                <i class="fa fa-arrow-right"></i>
+            </div>
+            <div id="trash" class="row"></div>
+        </div>
+
+        <div class="secao">
+            <h2>🎞️ CLÁSSICOS IMORTAIS</h2>
+            <div id="classicos" class="row"></div>
         </div>
     </div>
 
     <div id="buscaPage" class="page">
-        <div style="padding:70px 15px 10px;">
-            <input id="inputBusca" style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;" placeholder="Pesquise por nome ou gênero..." onkeyup="realizarBusca()">
+        <div style="padding:40px 15px 10px; background:#000; position:sticky; top:0; z-index:1000;">
+            <input id="inputBusca" style="width:100%; padding:15px; border-radius:15px; background:#1a1a1a; border:none; color:#fff;" placeholder="Buscar filmes, atores ou gêneros..." onkeyup="buscar()">
         </div>
-        <div id="resultados-lista"></div>
+        <div id="resultados"></div>
     </div>
 
     <div id="detalhes" class="page">
-        <div id="m-backdrop" style="height:35vh; background-size:cover; position:relative;">
-            <button onclick="ir('home')" style="position:absolute; top:70px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:40px; height:40px; border-radius:50%"><i class="fa fa-arrow-left"></i></button>
+        <div id="m-backdrop" style="height:40vh; background-size:cover; position:relative;">
+            <button onclick="ir('home')" style="position:absolute; top:40px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:45px; height:45px; border-radius:50%;"><i class="fa fa-chevron-left"></i></button>
         </div>
         <div style="padding:20px;">
-            <h1 id="m-titulo"></h1>
-            <button onclick="play()" style="width:100%; background:var(--red); color:#fff; padding:15px; border:none; border-radius:10px; font-weight:bold; margin-bottom:20px;">▶ ASSISTIR AGORA</button>
-            <div style="display:flex; justify-content:center; gap:20px;">
-                <button onclick="abrirVLC()" class="player-circle" style="background:#ff8800">VLC</button>
-                <button onclick="abrirMX()" class="player-circle" style="background:#0052d4">MX</button>
+            <h1 id="m-titulo" style="font-size:28px;"></h1>
+            <button onclick="play()" style="width:100%; background:var(--red); color:#fff; padding:18px; border:none; border-radius:12px; font-weight:bold; margin:20px 0;">ASSISTIR AGORA</button>
+            <div style="display:flex; justify-content:center; gap:30px;">
+                <div onclick="abrirVLC()" class="btn-circle" style="background:#ff8800">VLC</div>
+                <div onclick="abrirMX()" class="btn-circle" style="background:#0052d4">MX</div>
             </div>
-            <p id="m-sinopse" style="margin-top:20px; color:#bbb; line-height:1.6;"></p>
+            <p id="m-sinopse" style="margin-top:25px; color:#aaa; line-height:1.6;"></p>
         </div>
     </div>
 
-    <nav class="nav-bar">
-        <div class="nav-btn active" id="btnHome" onclick="ir('home')"><i class="fa fa-home"></i><span>Home</span></div>
-        <div class="nav-btn" onclick="ir('buscaPage')"><i class="fa fa-search"></i><span>Busca</span></div>
-        <div class="nav-btn" onclick="alert('Explorar')"><i class="fa fa-compass"></i><span>Explorar</span></div>
+    <nav style="position:fixed; bottom:0; width:100%; height:75px; background:#0a0a0a; border-top:1px solid #111; display:flex; justify-content:space-around; align-items:center; z-index:2000;">
+        <div onclick="ir('home')"><i class="fa fa-home"></i></div>
+        <div onclick="ir('buscaPage')"><i class="fa fa-search"></i></div>
+        <div><i class="fa fa-compass"></i></div>
     </nav>
 
     <script src="app.js"></script>
