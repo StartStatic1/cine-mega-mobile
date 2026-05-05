@@ -1,106 +1,59 @@
 const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
-let filmeAtual = "";
+let currentHeroIndex = 0;
+let heroData = [];
 
-async function api(url) {
-    const r = await fetch(url);
-    return await r.json();
-}
-
-// Navegação Inteligente
-function ir(p) {
-    document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
-    document.getElementById(p).classList.add('active');
-    window.scrollTo(0,0);
-}
-
-// Slider Automático
-async function hero() {
+// AUTO SLIDER
+async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
-    let i = 0;
-    const el = document.getElementById("hero");
-    
-    function updateHero() {
-        const f = d.results[i];
-        el.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${f.backdrop_path})`;
-        document.getElementById("hero-titulo").innerText = f.title;
-        i = (i + 1) % 5;
-    }
-    updateHero();
-    setInterval(updateHero, 5000);
+    heroData = d.results.slice(0, 5);
+    renderHero();
+    setInterval(nextHero, 6000);
 }
 
-// Top 10 Numerado
-async function carregarHome() {
-    const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
+function renderHero() {
+    const f = heroData[currentHeroIndex];
+    const hero = document.getElementById('hero');
+    hero.style.backgroundImage = `url(https://image.tmdb.org/p/original${f.backdrop_path})`;
+    document.getElementById('hero-titulo').innerText = f.title;
+    document.getElementById('hero-sinopse').innerText = f.overview;
     
-    document.getElementById("top10").innerHTML = d.results.slice(0, 10).map((f, i) => `
-        <div class="card-top" onclick="abrir(${f.id})">
-            <span class="numero">${i + 1}</span>
-            <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
-        </div>
-    `).join('');
-
-    const estreias = await api(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=pt-BR`);
-    document.getElementById("estreias").innerHTML = estreias.results.map(f => `
-        <div class="card-normal" onclick="abrir(${f.id})">
-            <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
-            <p style="font-size:10px; text-align:center; margin-top:5px;">${f.title}</p>
-        </div>
-    `).join('');
+    // Pontinhos
+    const dots = document.getElementById('hero-dots');
+    dots.innerHTML = heroData.map((_, i) => `<div class="dot ${i === currentHeroIndex ? 'active' : ''}"></div>`).join('');
 }
 
-// Abrir Detalhes Otimizado
-async function abrir(id) {
-    ir("detalhes");
-    const d = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=recommendations`);
-    
-    filmeAtual = d.title;
-    document.getElementById("titulo").innerText = d.title;
-    document.getElementById("sinopse").innerText = d.overview || "Sem sinopse disponível.";
-    document.getElementById("poster").src = `https://image.tmdb.org/t/p/w300${d.poster_path}`;
-    document.getElementById("backdrop").style.backgroundImage = `url(https://image.tmdb.org/t/p/original${d.backdrop_path})`;
-    document.getElementById("meta").innerText = `${d.release_date.split('-')[0]} • ⭐ ${d.vote_average.toFixed(1)}`;
-
-    document.getElementById("recomendados").innerHTML = d.recommendations.results.slice(0, 10).map(f => `
-        <div class="card-normal" onclick="abrir(${f.id})">
-            <img src="https://image.tmdb.org/t/p/w200${f.poster_path}">
-        </div>
-    `).join('');
+function nextHero() {
+    currentHeroIndex = (currentHeroIndex + 1) % heroData.length;
+    renderHero();
 }
 
-// Busca Corrigida
+// BUSCA IGUAL AO PRINT
 async function buscar() {
     const q = document.getElementById("busca").value;
     if(!q) return;
-    ir("buscaPage");
+    ir('buscaPage');
     const d = await api(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=pt-BR`);
     
     document.getElementById("resultados").innerHTML = d.results.map(f => `
-        <div class="card-normal" onclick="abrir(${f.id})" style="width:100%">
-            <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
+        <div class="card-search" onclick="abrir(${f.id})">
+            <img src="https://image.tmdb.org/t/p/w500${f.poster_path}">
+            <p style="font-size:12px; margin-top:5px; font-weight:bold">${f.title}</p>
         </div>
     `).join('');
 }
 
-// Players Externos (Intent Sniper)
-function play() {
-    const link = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    window.open(link, "_blank");
+// TOP 10 NUMERADO (Lógica mantida mas CSS atualizado)
+async function loadHome() {
+    const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
+    document.getElementById("top10").innerHTML = d.results.slice(0, 10).map((f, i) => `
+        <div class="card-top" onclick="abrir(${f.id})" style="position:relative; margin-left:30px; min-width:140px">
+            <span class="numero" style="position:absolute; left:-30px; bottom:-10px; font-size:70px; font-weight:900; -webkit-text-stroke: 1.5px #fff; color:#000; z-index:5">${i + 1}</span>
+            <img src="https://image.tmdb.org/t/p/w300${f.poster_path}" style="width:100%; border-radius:10px">
+        </div>
+    `).join('');
 }
 
-function abrirVLC() {
-    const link = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    const intent = `intent://${link.replace(/^https?:\/\//, '')}#Intent;scheme=http;type=video/*;package=org.videolan.vlc;end`;
-    location.href = intent;
-}
-
-function abrirMX() {
-    const link = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    const intent = `intent://${link.replace(/^https?:\/\//, '')}#Intent;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;end`;
-    location.href = intent;
-}
-
-// Init
-hero();
-carregarHome();
+// CHAMADAS DE INICIALIZAÇÃO
+initHero();
+loadHome();
