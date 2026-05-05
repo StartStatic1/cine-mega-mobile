@@ -2,65 +2,78 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cine Mega VOD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Cine Mega</title>
 
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body oncontextmenu="return false">
+
+<div class="app">
 
 <!-- HEADER -->
 <header class="header">
-  <h1>CINE MEGA</h1>
-  <input type="text" id="busca" placeholder="Buscar filme..." onkeyup="if(event.key==='Enter') buscarFilme()">
+  <div class="logo">CINE MEGA</div>
+  <input id="busca" placeholder="Buscar filme..." onkeyup="if(event.key==='Enter') buscar()">
 </header>
 
 <!-- HOME -->
 <div id="home" class="page active">
 
-  <!-- HERO -->
   <div id="hero" class="hero"></div>
 
-  <!-- TOP 10 -->
   <div class="secao">
-    <h2>🔥 Top 10 Hoje</h2>
-    <div id="top10" class="grid"></div>
-  </div>
-
-  <!-- ESTREIAS -->
-  <div class="secao">
-    <h2>🎬 Vai Estrear</h2>
-    <div id="estreias" class="grid"></div>
-  </div>
-
-  <!-- GENEROS -->
-  <div class="secao">
-    <h2>Ação</h2>
-    <div id="acao" class="grid"></div>
+    <h2>🔥 Top 10</h2>
+    <div id="top10" class="row"></div>
   </div>
 
   <div class="secao">
-    <h2>Comédia</h2>
-    <div id="comedia" class="grid"></div>
+    <h2>🎬 Estreias</h2>
+    <div id="estreias" class="row"></div>
   </div>
 
 </div>
 
-<!-- RESULTADOS -->
-<div id="buscarPage" class="page">
-  <h2>Resultados</h2>
+<!-- BUSCA -->
+<div id="buscaPage" class="page">
   <div id="resultados" class="grid"></div>
 </div>
 
+<!-- DETALHES -->
+<div id="detalhes" class="page">
+  <div id="backdrop" class="backdrop"></div>
+
+  <div class="detalhes-content">
+    <img id="poster">
+
+    <h1 id="titulo"></h1>
+    <p id="meta"></p>
+
+    <button class="btn-play" onclick="play()">▶ ASSISTIR</button>
+
+    <div class="players">
+      <button onclick="abrirVLC()">VLC</button>
+      <button onclick="abrirMX()">MX</button>
+    </div>
+
+    <h3>Sinopse</h3>
+    <p id="sinopse"></p>
+
+    <h3>Você pode gostar</h3>
+    <div id="recomendados" class="row"></div>
+  </div>
+</div>
+
 <!-- NAV -->
-<nav class="bottom-nav">
+<nav class="nav">
   <button onclick="ir('home')">🏠</button>
-  <button onclick="ir('buscarPage')">🔍</button>
+  <button onclick="ir('buscaPage')">🔍</button>
 </nav>
 
-<script src="app.js"></script>
+</div>
 
+<script src="app.js"></script>
 </body>
 </html>
