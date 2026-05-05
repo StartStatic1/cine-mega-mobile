@@ -7,20 +7,16 @@
 
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
-
 </head>
+
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <h1>CINE MEGA</h1>
 </header>
 
-<!-- PÁGINAS -->
-
 <!-- HOME -->
 <div id="home" class="page active">
-  <div id="hero"></div>
   <h2>🔥 Em Alta</h2>
   <div id="lista-populares" class="grid"></div>
 </div>
@@ -34,14 +30,14 @@
 
 <!-- PLAYER -->
 <div id="player" class="page">
-  <video id="video" controls autoplay></video>
+  <h2 id="tituloFilme"></h2>
+  <video id="video" controls></video>
 </div>
 
-<!-- NAV BAR -->
+<!-- NAV -->
 <nav class="bottom-nav">
   <button onclick="ir('home')">🏠</button>
   <button onclick="ir('buscar')">🔍</button>
-  <button onclick="ir('player')">🎬</button>
 </nav>
 
 <script src="app.js"></script>
