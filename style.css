@@ -1,47 +1,31 @@
-:root { --red: #e50914; --bg: #000; --card-bg: #111; }
-body { margin:0; background:var(--bg); font-family: 'Segoe UI', Roboto, sans-serif; color:#fff; overflow-x:hidden; }
+:root { --red: #e50914; --bg: #000; }
 
-.app { max-width:500px; margin:auto; position:relative; min-height:100vh; padding-bottom: 80px; }
+body { margin:0; background:var(--bg); color:#fff; font-family: sans-serif; overflow-x:hidden; }
 
-/* HEADER */
-.header { position:fixed; width:100%; max-width:500px; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); padding:10px 15px; z-index:100; display:flex; align-items:center; justify-content:space-between; }
-.logo { color:var(--red); font-weight:900; font-size:20px; letter-spacing:1px; }
-.search-bar { width:60%; position:relative; }
-#busca { width:100%; padding:8px 15px; border-radius:20px; border:1px solid #333; background:#1a1a1a; color:#fff; outline:none; }
+/* HERO SLIDER ESTILO PRINT */
+.hero { height: 55vh; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; }
+.hero::before { content:''; position:absolute; inset:0; background: linear-gradient(0deg, #000 15%, transparent 70%); }
+.hero-content { position:relative; z-index:10; padding:20px; width:100%; }
+#hero-sinopse { font-size:12px; color:#ccc; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:10px 0; }
+.hero-btns { display:flex; gap:10px; }
+.btn-hero-play { background:#fff; color:#000; border:none; padding:10px 20px; border-radius:5px; font-weight:bold; }
+.btn-hero-info { background:rgba(255,255,255,0.2); color:#fff; border:none; padding:10px 20px; border-radius:5px; }
 
-/* HERO SLIDER (ESTILO DVD) */
-.hero { height:400px; background-size:cover; background-position:center; display:flex; align-items:flex-end; position:relative; transition: 0.5s; }
-.hero::after { content:''; position:absolute; width:100%; height:100%; background:linear-gradient(0deg, #000 10%, transparent 60%); }
-.hero-content { position:relative; z-index:2; padding:20px; width:100%; }
+/* PONTINHOS DO SLIDER */
+.hero-dots { display:flex; gap:5px; margin-top:15px; }
+.dot { width:6px; height:6px; background:rgba(255,255,255,0.3); border-radius:50%; }
+.dot.active { background:var(--red); width:15px; border-radius:10px; }
 
-/* SEÇÕES */
-.secao { padding:15px 0 0 15px; }
-.secao h2 { font-size:16px; margin-bottom:12px; color:#eee; }
-.row { display:flex; overflow-x:auto; gap:12px; padding-bottom:10px; scrollbar-width:none; }
-.row::-webkit-scrollbar { display:none; }
+/* BUSCA - POSTERS IGUAL AO PRINT (2 COLUNAS LARGAS) */
+.grid-search { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
+.grid-search .card-search img { width: 100%; border-radius: 12px; border: 1px solid #222; aspect-ratio: 2/3; object-fit: cover; }
 
-/* TOP 10 COM NÚMEROS GIGANTES */
-.card-top { position:relative; min-width:160px; height:220px; margin-left:20px; }
-.card-top img { height:100%; border-radius:10px; object-fit:cover; }
-.numero { position:absolute; left:-25px; bottom:-10px; font-size:80px; font-weight:900; color:var(--bg); -webkit-text-stroke: 2px #fff; z-index:5; line-height:1; }
+/* NAV INFERIOR */
+.nav { position:fixed; bottom:0; width:100%; height:70px; background:#0a0a0a; border-top:1px solid #111; display:flex; justify-content:space-around; align-items:center; z-index:1000; }
+.nav-item { display:flex; flex-direction:column; align-items:center; color:#555; font-size:10px; }
+.nav-item.active { color:var(--red); }
+.nav-item i { font-size:20px; margin-bottom:4px; }
 
-.card-normal { min-width:120px; cursor:pointer; }
-.card-normal img { width:100%; border-radius:8px; border:1px solid #222; }
-
-/* DETALHES */
-.page { display:none; animation: fadeIn 0.3s; }
-.page.active { display:block; }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-.backdrop { height:250px; background-size:cover; position:relative; border-bottom:3px solid var(--red); }
-.detalhes-content { padding:15px; }
-#poster { width:130px; border-radius:10px; margin-top:-80px; position:relative; z-index:5; border:3px solid var(--bg); box-shadow:0 0 20px rgba(0,0,0,0.5); }
-
-.btn-play { width:100%; background:var(--red); color:#fff; padding:15px; border:none; border-radius:10px; font-weight:bold; margin:15px 0; font-size:16px; }
-.players-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-.players-grid button { padding:12px; border-radius:8px; border:none; color:#fff; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; }
-
-/* NAV */
-.nav { position:fixed; bottom:0; width:100%; max-width:500px; display:flex; justify-content:space-around; background:rgba(10,10,10,0.95); padding:15px; border-top:1px solid #222; z-index:1000; }
-.nav button { background:none; border:none; font-size:24px; color:#666; transition: 0.3s; }
-.nav button.active { color:var(--red); }
+/* CATEGORIAS */
+.card-genero { background:#111; padding:10px 25px; border-radius:20px; border:1px solid #222; font-size:12px; white-space:nowrap; }
+.card-genero-more { background:var(--red); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
