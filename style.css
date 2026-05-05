@@ -1,37 +1,45 @@
-:root { --red: #e50914; --bg: #000; --card-bg: #111; }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans-serif; overflow-x:hidden; padding-bottom: 80px; }
+:root { --red: #e50914; --bg: #000; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+body { margin: 0; background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; padding-bottom: 75px; }
 
-/* HEADER FIXO */
-.header { position:fixed; top:0; width:100%; max-width:500px; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); padding:12px 20px; z-index:1000; display:flex; justify-content:space-between; align-items:center; }
-.logo { color:var(--red); font-weight:900; font-size:22px; letter-spacing:1px; }
+/* HEADER COM LUPA */
+.app-header { position: fixed; top: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1000; }
+.logo { color: var(--red); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
 
-/* HERO SLIDER (ESTILO APP) */
-.hero { width:100%; height:70vh; background-size:cover; background-position:center; position:relative; display:flex; align-items:flex-end; }
-.hero::before { content:''; position:absolute; inset:0; background: linear-gradient(0deg, #000 15%, transparent 80%); }
-.hero-content { position:relative; z-index:10; padding:25px; width:100%; }
-.hero-content h1 { font-size:30px; margin:0; font-weight:900; }
-.hero-content p { font-size:12px; color:#ccc; margin:10px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.hero-btns { display:flex; gap:10px; margin-top:15px; }
-.btn-h { border:none; padding:12px 25px; border-radius:5px; font-weight:bold; display:flex; align-items:center; gap:8px; }
-.btn-h.play { background:#fff; color:#000; }
-.btn-h.info { background:rgba(255,255,255,0.2); color:#fff; }
+/* HERO SLIDER 9:16 IMERSIVO */
+.hero-slider { width: 100%; height: 80vh; position: relative; overflow: hidden; }
+.hero-item { width: 100%; height: 100%; background-size: cover; background-position: center; display: flex; align-items: flex-end; position: absolute; opacity: 0; transition: 0.8s ease; }
+.hero-item.active { opacity: 1; }
+.hero-overlay { width: 100%; padding: 40px 20px; background: linear-gradient(0deg, #000 20%, transparent 80%); }
+.hero-overlay h2 { font-size: 28px; margin: 0; }
+.hero-overlay p { font-size: 13px; color: #ccc; margin: 10px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hero-dots { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 8px; }
+.dot { width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; }
+.dot.active { background: var(--red); width: 20px; border-radius: 10px; }
 
-/* SEÇÕES E TOP 10 (SEM BUG) */
-.secao { padding: 25px 0 0 15px; }
-.row { display:flex; overflow-x:auto; gap:15px; padding:10px 10px 20px 30px; scrollbar-width:none; }
-.row::-webkit-scrollbar { display:none; }
+/* TOP 10 - NÚMERO INTERNO (ESTILO NETFLIX) */
+.secao { padding: 20px 0 0 15px; }
+.row { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0 20px 0; scrollbar-width: none; }
+.row::-webkit-scrollbar { display: none; }
+.card-top { position: relative; min-width: 140px; height: 200px; flex-shrink: 0; border-radius: 8px; overflow: hidden; }
+.card-top img { width: 100%; height: 100%; object-fit: cover; }
+.numero-vod { position: absolute; left: 5px; bottom: -5px; font-size: 80px; font-weight: 900; color: rgba(255,255,255,0.1); -webkit-text-stroke: 1.5px rgba(255,255,255,0.6); z-index: 10; line-height: 1; pointer-events: none; }
 
-.card-top { position:relative; min-width:140px; height:210px; flex-shrink:0; }
-.card-top img { height:100%; width:100%; border-radius:10px; object-fit:cover; position:relative; z-index:2; border: 1px solid #222; }
-.numero { position:absolute; left:-35px; bottom:-15px; font-size:100px; font-weight:900; color:#000; -webkit-text-stroke: 2px #fff; z-index:1; line-height:1; }
+/* BUSCA EM LISTA (IGUAL VOCÊ PEDIU) */
+.search-item { display: flex; gap: 15px; padding: 10px; border-bottom: 1px solid #111; align-items: center; }
+.search-item img { width: 80px; height: 120px; border-radius: 8px; object-fit: cover; }
+.search-info { flex: 1; }
+.search-info h4 { margin: 0 0 5px 0; font-size: 14px; }
+.search-info p { font-size: 11px; color: #888; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* BUSCA 2x2 */
-.grid-search { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; }
-.card-search img { width:100%; border-radius:12px; border:1px solid #222; aspect-ratio: 2/3; object-fit:cover; }
+/* BOTÕES REDONDOS VLC/MX */
+.player-circle { width: 50px; height: 50px; border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; }
 
 /* NAV INFERIOR */
-.nav { position:fixed; bottom:0; width:100%; max-width:500px; height:75px; background:#080808; border-top:1px solid #1a1a1a; display:flex; justify-content:space-around; align-items:center; z-index:1000; }
-.nav-item { color:#666; text-align:center; font-size:11px; text-decoration:none; display:flex; flex-direction:column; align-items:center; }
-.nav-item.active { color:var(--red); }
-.nav-item i { font-size:24px; margin-bottom:4px; }
+.nav-bar { position: fixed; bottom: 0; width: 100%; height: 70px; background: #080808; border-top: 1px solid #1a1a1a; display: flex; justify-content: space-around; align-items: center; z-index: 2000; }
+.nav-btn { color: #555; text-align: center; font-size: 10px; cursor: pointer; }
+.nav-btn.active { color: var(--red); }
+.nav-btn i { font-size: 22px; margin-bottom: 4px; display: block; }
+
+.page { display: none; }
+.page.active { display: block; }
