@@ -1,43 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cine Mega VOD</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cine Mega VOD</title>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+<!-- HEADER -->
 <header class="header">
   <h1>CINE MEGA</h1>
+  <input type="text" id="busca" placeholder="Buscar filme..." onkeyup="if(event.key==='Enter') buscarFilme()">
 </header>
 
 <!-- HOME -->
 <div id="home" class="page active">
-  <h2>🔥 Em Alta</h2>
-  <div id="lista-populares" class="grid"></div>
+
+  <!-- HERO -->
+  <div id="hero" class="hero"></div>
+
+  <!-- TOP 10 -->
+  <div class="secao">
+    <h2>🔥 Top 10 Hoje</h2>
+    <div id="top10" class="grid"></div>
+  </div>
+
+  <!-- ESTREIAS -->
+  <div class="secao">
+    <h2>🎬 Vai Estrear</h2>
+    <div id="estreias" class="grid"></div>
+  </div>
+
+  <!-- GENEROS -->
+  <div class="secao">
+    <h2>Ação</h2>
+    <div id="acao" class="grid"></div>
+  </div>
+
+  <div class="secao">
+    <h2>Comédia</h2>
+    <div id="comedia" class="grid"></div>
+  </div>
+
 </div>
 
-<!-- BUSCA -->
-<div id="buscar" class="page">
-  <input type="text" id="inputBusca" placeholder="Buscar filme...">
-  <button onclick="buscarFilme()">Buscar</button>
+<!-- RESULTADOS -->
+<div id="buscarPage" class="page">
+  <h2>Resultados</h2>
   <div id="resultados" class="grid"></div>
-</div>
-
-<!-- PLAYER -->
-<div id="player" class="page">
-  <h2 id="tituloFilme"></h2>
-  <video id="video" controls></video>
 </div>
 
 <!-- NAV -->
 <nav class="bottom-nav">
   <button onclick="ir('home')">🏠</button>
-  <button onclick="ir('buscar')">🔍</button>
+  <button onclick="ir('buscarPage')">🔍</button>
 </nav>
 
 <script src="app.js"></script>
