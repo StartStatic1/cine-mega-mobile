@@ -1,150 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cine Mega VOD</title>
-    
-    <script src="https://encouragingjawsordinarily.com/dc/14/b2/dc14b2a74392b432835a710add963d91.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cine Mega VOD</title>
 
-    <style>
-        /* DESIGN MOBILE VOD - TUDO EM UM ARQUIVO */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            margin: 0; padding: 0 0 80px 0; 
-            background: #000; color: #fff; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            overflow-x: hidden;
-            user-select: none;
-        }
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
 
-        /* HEADER FIXO APP */
-        .app-header {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #1a1a1a;
-        }
-        .app-header h1 { color: #e50914; margin: 0; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; }
-
-        /* SEÇÕES MOBILE */
-        .secao { margin-top: 20px; padding-left: 15px; }
-        .titulo-secao { font-size: 13px; font-weight: bold; color: #ffcc00; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .carrossel { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; scrollbar-width: none; }
-        .carrossel::-webkit-scrollbar { display: none; }
-
-        .card { flex: 0 0 auto; width: 125px; }
-        .card img { width: 100%; height: 185px; border-radius: 8px; object-fit: cover; background: #111; border: 1px solid #222; }
-        .card p { font-size: 10px; margin: 5px 0; text-align: center; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* BARRA DE NAVEGAÇÃO ESTILO APP (BOTTOM NAV) */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 65px;
-            background: #0a0a0a; border-top: 1px solid #222;
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000;
-        }
-        .nav-item { text-align: center; color: #555; text-decoration: none; font-size: 10px; font-weight: bold; }
-        .nav-item.active { color: #e50914; }
-        .nav-item span { display: block; font-size: 22px; margin-bottom: 2px; }
-
-        /* TELA DE BUSCA OVERLAY */
-        #search-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000; display: none; padding: 20px;
-        }
-        .search-input {
-            width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #333;
-            background: #111; color: #fff; font-size: 16px;
-        }
-
-        /* BANNER PIX DISCRETO */
-        .pix-app { background: #111; margin: 15px; padding: 12px; border-radius: 10px; border: 1px solid #e50914; display: flex; justify-content: space-between; align-items: center; }
-        .pix-app span { font-size: 11px; color: #ccc; }
-        .btn-pix-app { background: #e50914; color: #fff; border: none; padding: 6px 12px; border-radius: 5px; font-size: 10px; font-weight: bold; }
-
-    </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-    <div class="app-header">
-        <h1>CINE MEGA VOD</h1>
-    </div>
+<!-- HEADER -->
+<header class="header">
+  <h1>CINE MEGA</h1>
+</header>
 
-    <div id="home-content">
-        <div class="pix-app">
-            <span>🍿 Ajude o Projeto (PIX)</span>
-            <button class="btn-pix-app" onclick="copiarPix()">COPIAR</button>
-        </div>
+<!-- PÁGINAS -->
 
-        <div class="secao">
-            <div class="titulo-secao">MAIS ASSISTIDOS</div>
-            <div class="carrossel" id="populares"></div>
-        </div>
+<!-- HOME -->
+<div id="home" class="page active">
+  <div id="hero"></div>
+  <h2>🔥 Em Alta</h2>
+  <div id="lista-populares" class="grid"></div>
+</div>
 
-        <div class="secao">
-            <div class="titulo-secao">LANÇAMENTOS</div>
-            <div class="carrossel" id="estreias"></div>
-        </div>
+<!-- BUSCA -->
+<div id="buscar" class="page">
+  <input type="text" id="inputBusca" placeholder="Buscar filme...">
+  <button onclick="buscarFilme()">Buscar</button>
+  <div id="resultados" class="grid"></div>
+</div>
 
-        <div class="secao">
-            <div class="titulo-secao">BAÚ DO TRASH (80-95)</div>
-            <div class="carrossel" id="trash"></div>
-        </div>
-    </div>
+<!-- PLAYER -->
+<div id="player" class="page">
+  <video id="video" controls autoplay></video>
+</div>
 
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item active" onclick="navegar('home')"><span>🏠</span>HOME</a>
-        <a href="#" class="nav-item" onclick="navegar('search')"><span>🔍</span>BUSCA</a>
-        <a href="#" class="nav-item" onclick="navegar('trash')"><span>💀</span>TRASH</a>
-        <a href="#" class="nav-item"><span>⚙️</span>INFO</a>
-    </nav>
+<!-- NAV BAR -->
+<nav class="bottom-nav">
+  <button onclick="ir('home')">🏠</button>
+  <button onclick="ir('buscar')">🔍</button>
+  <button onclick="ir('player')">🎬</button>
+</nav>
 
-    <div id="search-screen">
-        <input type="text" class="search-input" placeholder="O que vamos assistir hoje?" id="inputBusca">
-        <button onclick="navegar('home')" style="background:none; border:none; color:#e50914; margin-top:15px; font-weight:bold;">✕ CANCELAR</button>
-        <div id="resultados-busca" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px;"></div>
-    </div>
+<script src="app.js"></script>
 
-    <script>
-        const API_KEY = "c90fb79a2f7d756a49bee848bce5f413";
-
-        async function carregarVOD() {
-            // Populares
-            const p = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`).then(r => r.json());
-            document.getElementById('populares').innerHTML = p.results.map(f => `
-                <div class="card" onclick="alert('Abrir detalhes do filme: ${f.title}')">
-                    <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
-                    <p>${f.title}</p>
-                </div>
-            `).join('');
-
-            // Trash
-            const t = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=27,35&primary_release_date.gte=1980-01-01&primary_release_date.lte=1995-12-31`).then(r => r.json());
-            document.getElementById('trash').innerHTML = t.results.map(f => `
-                <div class="card">
-                    <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
-                    <p>${f.title}</p>
-                </div>
-            `).join('');
-        }
-
-        function navegar(aba) {
-            if(aba === 'search') {
-                document.getElementById('search-screen').style.display = 'block';
-            } else {
-                document.getElementById('search-screen').style.display = 'none';
-            }
-            // Lógica de mudar classe active nos ícones...
-        }
-
-        function copiarPix() { navigator.clipboard.writeText("84999585659"); alert("PIX Copiado!"); }
-
-        carregarVOD();
-    </script>
 </body>
 </html>
