@@ -5,70 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Cine Mega VOD</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body oncontextmenu="return false">
 
 <div class="app">
     <header class="header">
         <div class="logo">CINE MEGA</div>
-        <div class="search-bar">
-            <input id="busca" placeholder="Buscar filmes..." onkeyup="if(event.key==='Enter') buscar()">
-        </div>
+        <div class="search-trigger" onclick="ir('buscaPage')"><i class="fa fa-search"></i></div>
     </header>
 
     <div id="home" class="page active">
         <div id="hero" class="hero">
             <div class="hero-content">
-                <h1 id="hero-titulo" style="margin:0; font-size:24px;">Carregando...</h1>
-                <button class="btn-play" style="width:auto; padding:10px 30px;" onclick="alert('Clique num filme para assistir')">ASSISTIR</button>
+                <h1 id="hero-titulo">---</h1>
+                <p id="hero-sinopse">---</p>
+                <div class="hero-btns">
+                    <button class="btn-hero-play" onclick="playHero()"><i class="fa fa-play"></i> Assistir</button>
+                    <button class="btn-hero-info" onclick="infoHero()"><i class="fa fa-info-circle"></i> Info</button>
+                </div>
+                <div class="hero-dots" id="hero-dots"></div>
             </div>
         </div>
 
         <div class="secao">
-            <h2>🔥 Top 10 da Semana</h2>
+            <div class="titulo-row">
+                <h2>🔥 TOP 10 SEMANA</h2>
+                <i class="fa fa-chevron-right"></i>
+            </div>
             <div id="top10" class="row"></div>
         </div>
 
         <div class="secao">
-            <h2>📅 Vai Estrear</h2>
-            <div id="estreias" class="row"></div>
+            <div class="titulo-row">
+                <h2>📂 CATEGORIAS</h2>
+                <i class="fa fa-chevron-right" onclick="alert('Ver todos os gêneros')"></i>
+            </div>
+            <div id="generos" class="row">
+                <div class="card-genero" onclick="buscarGenero(27)">Terror</div>
+                <div class="card-genero" onclick="buscarGenero(28)">Ação</div>
+                <div class="card-genero" onclick="buscarGenero(35)">Comédia</div>
+                <div class="card-genero" onclick="buscarGenero(80)">Crime</div>
+                <div class="card-genero-more"><i class="fa fa-arrow-right"></i></div>
+            </div>
         </div>
     </div>
 
     <div id="buscaPage" class="page">
-        <h2 style="padding:15px 0 0 15px">Resultados da busca</h2>
-        <div id="resultados" class="grid"></div>
+        <div class="busca-header">
+            <input id="busca" placeholder="O que você quer assistir?" onkeyup="if(event.key==='Enter') buscar()">
+            <button onclick="buscar()"><i class="fa fa-search"></i></button>
+        </div>
+        <div id="resultados" class="grid-search"></div>
     </div>
 
     <div id="detalhes" class="page">
         <div id="backdrop" class="backdrop">
-            <button class="fechar" onclick="ir('home')" style="position:absolute; top:70px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; padding:10px; border-radius:50%">✕</button>
+            <div class="back-btn" onclick="fecharDetalhes()"><i class="fa fa-arrow-left"></i></div>
         </div>
-
         <div class="detalhes-content">
-            <img id="poster">
-            <h1 id="titulo" style="margin:10px 0 5px 0"></h1>
-            <p id="meta" style="color:#ffcc00; margin:0 0 15px 0"></p>
-
-            <button class="btn-play" onclick="play()">▶ REPRODUZIR AGORA</button>
-
-            <div class="players-grid">
-                <button onclick="abrirVLC()" style="background:#ff8800">VLC PLAYER</button>
-                <button onclick="abrirMX()" style="background:#0052d4">MX PLAYER</button>
+            <div class="main-info">
+                <img id="poster" class="poster-float">
+                <div class="text-info">
+                    <h1 id="titulo"></h1>
+                    <p id="meta"></p>
+                </div>
             </div>
-
-            <h3 style="margin-top:25px">Sinopse</h3>
-            <p id="sinopse" style="color:#bbb; line-height:1.5; font-size:14px;"></p>
-
-            <h3>Você pode gostar</h3>
+            <button class="btn-play-vod" onclick="play()"><i class="fa fa-play"></i> REPRODUZIR AGORA</button>
+            <div class="external-players">
+                <button onclick="abrirVLC()" class="vlc"><i class="fa fa-play-circle"></i> VLC</button>
+                <button onclick="abrirMX()" class="mx"><i class="fa fa-play-circle"></i> MX</button>
+            </div>
+            <h3>Sinopse</h3>
+            <p id="sinopse"></p>
+            <h3>Sugestões</h3>
             <div id="recomendados" class="row"></div>
         </div>
     </div>
 
     <nav class="nav">
-        <button id="btnHome" class="active" onclick="ir('home')">🏠</button>
-        <button onclick="ir('buscaPage')">🔍</button>
-        <button onclick="alert('Em breve: Categorias')">🗂️</button>
+        <div class="nav-item active" onclick="ir('home')"><i class="fa fa-home"></i><span>Home</span></div>
+        <div class="nav-item" onclick="ir('buscaPage')"><i class="fa fa-search"></i><span>Busca</span></div>
+        <div class="nav-item" onclick="alert('Explorar')"><i class="fa fa-compass"></i><span>Explorar</span></div>
     </nav>
 </div>
 
