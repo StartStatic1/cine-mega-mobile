@@ -1,95 +1,115 @@
 const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 
-// NAVEGAÇÃO
+// NAV
 function ir(p) {
-  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
   document.getElementById(p).classList.add('active');
 }
 
-// API helper
+// API
 async function api(url) {
-  try {
-    const r = await fetch(url);
-    return await r.json();
-  } catch (e) {
-    console.log("Erro API:", e);
-    return null;
-  }
+  const r = await fetch(url);
+  return await r.json();
 }
 
-// HOME
-async function carregarHome() {
-  const lista = document.getElementById('lista-populares');
-  lista.innerHTML = "Carregando...";
+// HERO SLIDER
+async function carregarHero() {
+  const data = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
+  let i = 0;
 
+  setInterval(() => {
+    const f = data.results[i];
+    document.getElementById("hero").style.backgroundImage =
+      `url(https://image.tmdb.org/t/p/original${f.backdrop_path})`;
+    i = (i + 1) % 5;
+  }, 3000);
+}
+
+// TOP 10
+async function top10() {
   const data = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
 
-  if (!data || !data.results) {
-    lista.innerHTML = "Erro ao carregar filmes 😢";
-    return;
-  }
+  document.getElementById("top10").innerHTML =
+    data.results.slice(0,10).map((f,i)=>`
+      <div class="card" onclick="abrirFilme('${f.title}')">
+        <span class="numero">${i+1}</span>
+        <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
+      </div>
+    `).join('');
+}
 
-  lista.innerHTML = data.results.map(f => `
-    <div class="card" onclick="abrirFilme('${f.title.replace(/'/g, "")}')">
-      <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
-    </div>
-  `).join('');
+// ESTREIAS FUTURAS
+async function estreias() {
+  const hoje = new Date().toISOString().split("T")[0];
+
+  const data = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&primary_release_date.gte=${hoje}`);
+
+  document.getElementById("estreias").innerHTML =
+    data.results.slice(0,10).map(f=>`
+      <div class="card">
+        <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
+      </div>
+    `).join('');
+}
+
+// GENEROS
+async function generos() {
+  const acao = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28`);
+  const comedia = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=35`);
+
+  document.getElementById("acao").innerHTML =
+    acao.results.slice(0,10).map(f=>`
+      <div class="card" onclick="abrirFilme('${f.title}')">
+        <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
+      </div>
+    `).join('');
+
+  document.getElementById("comedia").innerHTML =
+    comedia.results.slice(0,10).map(f=>`
+      <div class="card" onclick="abrirFilme('${f.title}')">
+        <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
+      </div>
+    `).join('');
 }
 
 // BUSCA
 async function buscarFilme() {
-  const q = document.getElementById('inputBusca').value;
+  ir("buscarPage");
 
-  if (!q) return;
+  const q = document.getElementById("busca").value;
 
-  const lista = document.getElementById('resultados');
-  lista.innerHTML = "Buscando...";
+  const data = await api(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
 
-  const data = await api(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=pt-BR&query=${encodeURIComponent(q)}`);
-
-  if (!data || !data.results) {
-    lista.innerHTML = "Nada encontrado 😢";
-    return;
-  }
-
-  lista.innerHTML = data.results.map(f => `
-    <div class="card" onclick="abrirFilme('${f.title.replace(/'/g, "")}')">
-      <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
-    </div>
-  `).join('');
+  document.getElementById("resultados").innerHTML =
+    data.results.map(f=>`
+      <div class="card" onclick="abrirFilme('${f.title}')">
+        <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
+      </div>
+    `).join('');
 }
 
-// PLAYER
-async function abrirFilme(titulo) {
-  ir('player');
-
-  document.getElementById('tituloFilme').innerText = titulo;
-
-  const video = document.getElementById('video');
-
-  video.src = "";
-  video.load();
-
+// ABRIR FILME (EXTERNO + INTENT)
+function abrirFilme(titulo) {
   const link = `${MOTOR}/buscar?titulo=${encodeURIComponent(titulo)}`;
 
-  // Teste antes de jogar no player
-  try {
-    const teste = await fetch(link, { method: "HEAD" });
+  // tenta abrir externo
+  window.open(link, "_blank");
 
-    if (teste.ok) {
-      video.src = link;
-      video.play().catch(() => {});
-    } else {
-      alert("❌ Filme não encontrado no servidor");
-    }
-  } catch {
-    alert("⚠️ Erro ao conectar com servidor");
-  }
+  // VLC
+  window.location.href =
+    `intent://${link.replace("https://","")}#Intent;package=org.videolan.vlc;end`;
+
+  // MX Player
+  window.location.href =
+    `intent://${link.replace("https://","")}#Intent;package=com.mxtech.videoplayer.ad;end`;
 }
 
 // INIT
-carregarHome();
+carregarHero();
+top10();
+estreias();
+generos();
 
 // PWA
 if ('serviceWorker' in navigator) {
