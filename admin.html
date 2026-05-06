@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Admin Cine Mega</title>
+
+<style>
+body {
+    background:#000;
+    color:#fff;
+    font-family:Arial;
+    text-align:center;
+    padding:20px;
+}
+button {
+    padding:12px;
+    margin:5px;
+    border:none;
+    border-radius:6px;
+    background:#e50914;
+    color:#fff;
+}
+input {
+    padding:10px;
+    margin:5px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🔑 GERADOR DE CHAVES</h2>
+
+<input id="dias" type="number" value="2">
+<br>
+
+<button onclick="gerar()">Gerar</button>
+<button onclick="listar()">Listar</button>
+
+<div id="saida"></div>
+
+<script>
+
+async function gerar() {
+    const dias = document.getElementById("dias").value;
+
+    const r = await fetch("/api/criar", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ dias })
+    });
+
+    const d = await r.json();
+
+    document.getElementById("saida").innerHTML +=
+        `<p>✅ ${d.chave}</p>`;
+}
+
+async function listar() {
+    const r = await fetch("/api/listar");
+    const d = await r.json();
+
+    let html = "";
+
+    for (let c in d) {
+        html += `<p>${c} | expira: ${new Date(d[c].expira).toLocaleString()}</p>`;
+    }
+
+    document.getElementById("saida").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
