@@ -1,20 +1,33 @@
 {
+  "id": "/",
   "name": "Cine Mega VOD",
   "short_name": "CineMega",
+  "description": "O seu aplicativo definitivo para assistir os melhores filmes e lançamentos direto no celular.",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#e50914",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
