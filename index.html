@@ -3,42 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Cine Mega VOD</title>
+    <title>Cine Mega Mobile</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body oncontextmenu="return false">
+<body>
 
     <div id="home" class="page active">
         <div class="hero-container">
-            <div class="hero-dots" id="hero-dots"></div>
+            <div class="hero-dots" id="hero-dots" style="position:absolute; top:30px; width:100%; display:flex; justify-content:center; gap:6px; z-index:100;"></div>
             <div id="hero-wrapper"></div>
         </div>
-        <div class="secao"><h2>🔥 TOP 10 SEMANA</h2><div id="top10" class="row"></div></div>
-        <div class="secao"><h2>📅 EM BREVE (NO CINEMA)</h2><div id="embreve" class="row"></div></div>
-        <div class="secao"><h2>💀 BAÚ DO TRASH</h2><div id="trash" class="row"></div></div>
+        <div class="secao" style="padding-left:15px;"><h2>🔥 TOP 10 SEMANA</h2><div id="top10" class="row"></div></div>
+        <div class="secao" style="padding-left:15px;"><h2>📅 EM BREVE (2026+)</h2><div id="embreve" class="row"></div></div>
     </div>
 
     <div id="buscaPage" class="page">
-        <div style="padding:40px 15px 10px; background:#000; position:sticky; top:0; z-index:1000;"><input id="inputBusca" style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;" placeholder="Buscar..." onkeyup="buscar()"></div>
+        <div style="padding:40px 15px 10px; background:#000; position:sticky; top:0; z-index:1000;">
+            <input id="inputBusca" style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;" placeholder="Buscar..." onkeyup="buscar()">
+        </div>
         <div id="resultados"></div>
     </div>
 
     <div id="detalhes" class="page">
-        <div id="m-backdrop" style="height:35vh; background-size:cover; position:relative;"><button onclick="ir('home')" style="position:absolute; top:40px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:45px; height:45px; border-radius:50%;"><i class="fa fa-chevron-left"></i></button></div>
+        <div id="m-backdrop" style="height:35vh; background-size:cover; position:relative;">
+            <button onclick="ir('home')" style="position:absolute; top:40px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:45px; height:45px; border-radius:50%;"><i class="fa fa-chevron-left"></i></button>
+        </div>
         <div style="padding:20px;">
-            <div style="display:flex; gap:15px; align-items:flex-end;"><img id="m-poster" style="width:115px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:10;"><h1 id="m-titulo" style="font-size:22px;"></h1></div>
+            <div style="display:flex; gap:15px; align-items:flex-end;">
+                <img id="m-poster" style="width:115px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:10;">
+                <div><h1 id="m-titulo" style="font-size:22px; margin:0;"></h1><p id="m-meta" style="color:#ffcc00; font-size:11px; margin:5px 0;"></p></div>
+            </div>
             <button onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; background:var(--red); color:#fff; padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0;">ASSISTIR AGORA</button>
-            <div style="display:flex; justify-content:center; gap:25px;"><div onclick="abrirVLC()" style="width:60px; height:60px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; font-weight:bold;">VLC</div><div onclick="abrirMX()" style="width:60px; height:60px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; font-weight:bold;">MX</div></div>
+            <div style="display:flex; justify-content:center; gap:25px;">
+                <div onclick="abrirVLC()" style="width:60px; height:60px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; font-weight:bold;">VLC</div>
+                <div onclick="abrirMX()" style="width:60px; height:60px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; font-weight:bold;">MX</div>
+            </div>
             <h3>Sinopse</h3><p id="m-sinopse" style="color:#aaa; font-size:13px; line-height:1.5;"></p>
             <h3>Trailer</h3><div id="m-trailer"></div>
+            <h3>Elenco</h3><div id="m-elenco" class="row"></div>
             <h3>Você pode gostar</h3><div id="m-rec" class="row"></div>
         </div>
     </div>
 
-    <nav class="nav-bottom">
-        <div onclick="ir('home')"><i class="fa fa-home"></i><span>Home</span></div>
-        <div onclick="ir('buscaPage')"><i class="fa fa-search"></i><span>Busca</span></div>
+    <nav style="position:fixed; bottom:0; width:100%; height:75px; background:#0a0a0a; border-top:1px solid #111; display:flex; justify-content:space-around; align-items:center; z-index:2000;">
+        <div onclick="ir('home')"><i class="fa fa-home" style="font-size:22px; color:var(--red);"></i></div>
+        <div onclick="ir('buscaPage')"><i class="fa fa-search" style="font-size:22px; color:#444;"></i></div>
     </nav>
 
     <script src="app.js"></script>
