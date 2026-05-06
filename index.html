@@ -7,6 +7,15 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Ajuste apenas para a lista de busca não bugar o layout mobile */
+        #resultados { display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+        .item-busca-mobile { display: flex; gap: 12px; align-items: center; background: #080808; padding: 10px; border-radius: 8px; border-bottom: 1px solid #111; }
+        .item-busca-mobile img { width: 60px; height: 90px; border-radius: 5px; object-fit: cover; flex-shrink: 0; }
+        .item-busca-info { overflow: hidden; }
+        .item-busca-info h4 { margin: 0; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-busca-info p { margin: 5px 0 0; font-size: 11px; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
 </head>
 <body oncontextmenu="return false">
 
@@ -47,19 +56,19 @@
             <div id="aviso-embreve" style="background:#ffcc00; color:#000; padding:10px; border-radius:5px; font-weight:bold; font-size:11px; text-align:center; margin-bottom:15px; display:none;">🍿 EM BREVE NO CINE MEGA.</div>
             <div style="display:flex; gap:15px; align-items:flex-end;"><img id="m-poster" style="width:110px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:100;"><h1 id="m-titulo" style="font-size:20px; margin:0;"></h1></div>
             
-            <button id="btn-play-main" onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; color:#fff; padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0;">ASSISTIR AGORA</button>
+            <button id="btn-play-main" onclick="playNoMotor()" style="width:100%; color:#fff; padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0;">ASSISTIR AGORA</button>
             
             <div id="box-players-externos" style="display:flex; justify-content:center; gap:25px; margin-bottom: 20px;"></div>
             
             <h3>Sinopse</h3><p id="m-sinopse" style="color:#aaa; font-size:12px; line-height:1.5;"></p>
             <h3>Trailer</h3><div id="m-trailer"></div>
             <h3>Elenco</h3><div id="m-elenco" class="row"></div>
-            <h3>Você pode gostar</h3><div id="m-rec" class="row"></div>
+            <h3>Você também pode gostar</h3><div id="m-rec" class="row"></div>
         </div>
     </div>
 
     <nav style="position:fixed; bottom:0; width:100%; height:75px; background:#080808; border-top:1px solid #111; display:flex; justify-content:space-around; align-items:center; z-index:2000;">
-        <div onclick="ir('home')"><i class="fa fa-home" style="font-size:22px; color:var(--red);"></i></div>
+        <div onclick="ir('home')"><i class="fa fa-home" style="font-size:22px; color:#e50914;"></i></div>
         <div onclick="ir('buscaPage')"><i class="fa fa-search" style="font-size:22px; color:#444;"></i></div>
     </nav>
     <script src="app.js"></script>
