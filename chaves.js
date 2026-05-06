@@ -1,16 +1,16 @@
 // ===== CONFIG =====
 const API_URL = "https://cine-mega-mobile.onrender.com/validar";
 
-// ===== DEVICE ID =====
+// ===== DEVICE ID FIXO (SEM BUG) =====
 function getDeviceId() {
     let id = localStorage.getItem("cm_device");
 
     if (!id) {
-        id = btoa(
+        id = "dev_" + btoa(
             navigator.userAgent +
             screen.width +
             screen.height +
-            new Date().timezoneOffset
+            new Date().getTimezoneOffset()
         );
 
         localStorage.setItem("cm_device", id);
@@ -47,6 +47,7 @@ async function _cm_login() {
     const device = getDeviceId();
 
     erro.style.display = "none";
+    erro.innerText = "";
 
     try {
         const res = await fetch(`${API_URL}?chave=${chave}&device=${device}`);
@@ -78,7 +79,7 @@ async function _cm_login() {
     }
 }
 
-// ===== TESTE 2H =====
+// ===== TESTE =====
 function _cm_test() {
     const expira = Date.now() + (2 * 60 * 60 * 1000);
     salvarDados(expira);
@@ -96,7 +97,7 @@ function verificarAcesso() {
     }
 
     if (dados.device !== getDeviceId()) {
-        bloquear();
+        abrirLogin();
         return;
     }
 
@@ -115,19 +116,6 @@ function abrirLogin() {
 
 function fecharLogin() {
     document.getElementById("login").style.display = "none";
-}
-
-// ===== BLOQUEIO =====
-function bloquear() {
-    const login = document.getElementById("login");
-
-    login.style.display = "flex";
-    login.innerHTML = `
-        <h2 style="color:red;text-align:center;">
-        ⚠️ ACESSO BLOQUEADO<br><br>
-        Dispositivo inválido
-        </h2>
-    `;
 }
 
 // ===== INIT =====
