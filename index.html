@@ -23,18 +23,21 @@
         <div id="resultados"></div>
     </div>
 
-    <div id="detalhes" class="page">
+    <div id="detalhes" class="page detalhes-page">
         <button class="btn-back-clean" onclick="ir('home')"><i class="fa fa-chevron-left"></i></button>
         <div id="m-backdrop" class="detalhes-header"></div>
         <div style="padding:20px;">
             <div id="aviso-embreve" style="background:#ffcc00; color:#000; padding:10px; border-radius:5px; font-weight:bold; font-size:11px; text-align:center; margin-bottom:15px; display:none;">🍿 EM BREVE NO CINE MEGA.</div>
             <div style="display:flex; gap:15px; align-items:flex-end;"><img id="m-poster" style="width:110px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:100;"><h1 id="m-titulo" style="font-size:20px; margin:0;"></h1></div>
+            
             <button id="btn-play-main" onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; color:#fff; padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0;">ASSISTIR AGORA</button>
-            <div style="display:flex; justify-content:center; gap:25px;"><div onclick="abrirVLC()" style="width:55px; height:55px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">VLC</div><div onclick="abrirMX()" style="width:55px; height:55px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px;">MX</div></div>
+            
+            <div id="box-players-externos" style="display:flex; justify-content:center; gap:25px; margin-bottom: 20px;"></div>
+            
             <h3>Sinopse</h3><p id="m-sinopse" style="color:#aaa; font-size:12px; line-height:1.5;"></p>
             <h3>Trailer</h3><div id="m-trailer"></div>
             <h3>Elenco</h3><div id="m-elenco" class="row"></div>
-            <h3>Sugestões</h3><div id="m-rec" class="row"></div>
+            <h3>Você pode gostar</h3><div id="m-rec" class="row"></div>
         </div>
     </div>
 
