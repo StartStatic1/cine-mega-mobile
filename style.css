@@ -1,5 +1,13 @@
 :root { --red: #e50914; --bg: #000; }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+/* TRAVAS DE APP NATIVO */
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    outline: none; 
+    user-select: none; /* Bloqueia seleção de texto */
+    -webkit-user-drag: none; /* Bloqueia arrastar imagens */
+}
+
 body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans-serif; overflow-x:hidden; padding-bottom: 80px; }
 
 /* HEADER HOME (DISCRETO) */
@@ -14,8 +22,8 @@ body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans
 .hero-overlay h2 { font-size:22px; margin:0; font-weight:800; }
 .hero-overlay p { font-size:10px; color:#aaa; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:6px 0; line-height:1.2; max-width:85%; }
 
-/* DETALHES - ZERO BARRA (100% LIMPO) */
-.detalhes-header { height:42vh; background-size:cover; background-position:top; position:relative; }
+/* DETALHES - 100% LIMPO (SEM BARRA) */
+.detalhes-header { height:42vh; background-size:cover; background-position:top; position:relative; border:none; }
 .btn-back-clean { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:1100; }
 
 /* TOP 10 E CARROSSEL */
