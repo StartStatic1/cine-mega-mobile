@@ -16,9 +16,10 @@ function ir(p) {
     window.scrollTo(0,0);
 }
 
-// Slider Automático + Manual
+// Slider Automático Inteligente
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
+    if(!d) return;
     const movies = d.results.slice(0, 6);
     const wrapper = document.getElementById('hero-wrapper');
     const dots = document.getElementById('hero-dots');
@@ -30,7 +31,7 @@ async function initHero() {
                 <h2>${m.title}</h2>
                 <div class="hero-meta"><span>${m.release_date.split('-')[0]}</span> • <span>⭐ ${m.vote_average.toFixed(1)}</span></div>
                 <p>${m.overview}</p>
-                <button onclick="abrir(${m.id})" class="btn-play-hero">▶ ASSISTIR AGORA</button>
+                <button onclick="abrir(${m.id})" style="background:var(--red); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:150px;">▶ ASSISTIR</button>
             </div>
         </div>
     `).join('');
@@ -49,13 +50,13 @@ async function initHero() {
         document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
     });
 
-    // Pausa o automático quando o usuário toca
     wrapper.addEventListener('touchstart', () => clearInterval(sliderAuto));
     wrapper.addEventListener('touchend', startAuto);
     startAuto();
 }
 
-async function carregarHome() {
+// Carregar Abas (Top 10, Clássicos, Trash)
+async function carregarTudo() {
     const pop = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('top10').innerHTML = pop.results.slice(0, 10).map((f, i) => `
         <div class="card-top" onclick="abrir(${f.id})">
@@ -64,16 +65,14 @@ async function carregarHome() {
         </div>
     `).join('');
 
-    // Aba Clássicos (Resgatada)
-    const cla = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&release_date.lte=1995-01-01&sort_by=vote_count.desc`);
-    document.getElementById('classicos').innerHTML = cla.results.slice(0, 15).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
-    
-    // Trash (80-95)
     const trash = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=27,35&primary_release_date.gte=1980-01-01&primary_release_date.lte=1995-12-31`);
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+
+    const classicos = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&release_date.lte=1990-01-01&sort_by=vote_count.desc`);
+    document.getElementById('classicos').innerHTML = classicos.results.slice(0, 15).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// ABRIR COM TRAILER E ELENCO (Igual ao Print)
+// Detalhes com Trailer e Elenco
 async function abrir(id) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
@@ -82,28 +81,20 @@ async function abrir(id) {
     document.getElementById('m-backdrop').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
     document.getElementById('m-titulo').innerText = m.title;
-    document.getElementById('m-meta').innerText = `${m.release_date.split('-')[0]} • ${m.runtime} min • ⭐ ${m.vote_average.toFixed(1)}`;
     document.getElementById('m-sinopse').innerText = m.overview;
 
-    // Trailer
-    const trailer = m.videos.results.find(v => v.type === "Trailer");
-    document.getElementById('m-trailer').innerHTML = trailer ? `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${trailer.key}" frameborder="0" allowfullscreen></iframe>` : '';
+    const tr = m.videos.results.find(v => v.type === "Trailer");
+    document.getElementById('m-trailer').innerHTML = tr ? `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${tr.key}" frameborder="0" allowfullscreen></iframe>` : '';
 
-    // Elenco
-    document.getElementById('m-elenco').innerHTML = m.credits.cast.slice(0, 10).map(c => `
-        <div class="ator-item">
-            <img src="https://image.tmdb.org/t/p/w200${c.profile_path}" onerror="this.src='https://via.placeholder.com/80x80/111/fff?text=?'">
-            <p>${c.name}</p>
+    document.getElementById('m-elenco').innerHTML = m.credits.cast.slice(0, 8).map(c => `
+        <div style="flex:0 0 80px; text-align:center;">
+            <img src="https://image.tmdb.org/t/p/w200${c.profile_path}" style="width:65px; height:65px; border-radius:50%; object-fit:cover; border:2px solid var(--red);">
+            <p style="font-size:9px; margin-top:5px; color:#999;">${c.name}</p>
         </div>
     `).join('');
-
-    // Recomendados
-    document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// INTENTS SNIPER (ABRE DIRETO)
-function play() { window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`, "_blank"); }
-
+// Intents Sniper
 function abrirVLC() {
     const url = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
     window.location.href = `vlc://${url.replace(/^https?:\/\//, '')}`;
@@ -116,4 +107,4 @@ function abrirMX() {
 }
 
 initHero();
-carregarHome();
+carregarTudo();
