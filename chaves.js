@@ -1,7 +1,7 @@
 // ===== CONFIG =====
-const CHAVES_VALIDAS = ["VIP123","CINEMEGA2026","TESTEVIP"];
+const API_URL = "/api/validar"; // Vercel usa rota interna
 
-// ===== FINGERPRINT SIMPLES =====
+// ===== FINGERPRINT =====
 function getDeviceId() {
     let id = localStorage.getItem("cm_device");
 
@@ -18,7 +18,7 @@ function getDeviceId() {
     return id;
 }
 
-// ===== SALVAR EM 3 CAMADAS =====
+// ===== SALVAR =====
 function salvarDados(expira) {
     const data = JSON.stringify({
         expira,
@@ -30,7 +30,7 @@ function salvarDados(expira) {
     window.name = data;
 }
 
-// ===== LER DADOS =====
+// ===== LER =====
 function lerDados() {
     try {
         return JSON.parse(
@@ -44,30 +44,36 @@ function lerDados() {
     }
 }
 
-// ===== LOGIN =====
-function _cm_login() {
+// ===== LOGIN (AGORA ONLINE) =====
+async function _cm_login() {
     const input = document.getElementById("inputChave");
     const erro = document.getElementById("msgErro");
 
     const chave = input.value.trim().toUpperCase();
 
-    if (CHAVES_VALIDAS.includes(chave)) {
-        liberarAcesso(2);
-    } else {
+    erro.style.display = "none";
+
+    try {
+        const r = await fetch(`${API_URL}?chave=${chave}`);
+        const d = await r.json();
+
+        if (d.status === "ok") {
+            salvarDados(d.expira);
+            fecharLogin();
+        } else {
+            erro.innerText = "❌ Chave inválida!";
+            erro.style.display = "block";
+        }
+    } catch (e) {
+        erro.innerText = "⚠️ Erro conexão";
         erro.style.display = "block";
     }
 }
 
 // ===== TESTE =====
 function _cm_test() {
-    liberarAcesso(0.08); // 2h
-}
-
-// ===== LIBERAR =====
-function liberarAcesso(dias) {
     const agora = Date.now();
-    const expira = agora + (dias * 86400000);
-
+    const expira = agora + (2 * 60 * 60 * 1000); // 2h
     salvarDados(expira);
     fecharLogin();
 }
@@ -75,28 +81,18 @@ function liberarAcesso(dias) {
 // ===== VERIFICAÇÃO =====
 function verificarAcesso() {
     const dados = lerDados();
-
     const agora = Date.now();
 
-    // 🚨 DETECTA RESET SUSPEITO
-    if (!dados.device && localStorage.getItem("cm_suspeito")) {
-        bloquear();
-        return;
-    }
-
-    // primeira vez
     if (!dados.expira) {
         abrirLogin();
         return;
     }
 
-    // device mudou
     if (dados.device !== getDeviceId()) {
         bloquear();
         return;
     }
 
-    // expirado
     if (agora > dados.expira) {
         abrirLogin();
         return;
@@ -107,14 +103,12 @@ function verificarAcesso() {
 
 // ===== BLOQUEIO =====
 function bloquear() {
-    localStorage.setItem("cm_suspeito", "1");
-
     const login = document.getElementById("login");
     login.style.display = "flex";
     login.innerHTML = `
         <h2 style="color:red;text-align:center;">
         ⚠️ ACESSO BLOQUEADO<br><br>
-        Contate o suporte
+        Dispositivo inválido
         </h2>
     `;
 }
