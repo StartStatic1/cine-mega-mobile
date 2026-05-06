@@ -1,46 +1,58 @@
-let CHAVES = global.CHAVES || {};
-global.CHAVES = CHAVES;
+import { db } from "../lib/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const { chave, device } = req.query;
 
-  // não enviou chave
+  // sem chave
   if (!chave) {
     return res.json({ status: "erro" });
   }
 
-  const dados = CHAVES[chave];
+  try {
+    const ref = doc(db, "chaves", chave);
+    const snap = await getDoc(ref);
 
-  // chave não existe
-  if (!dados) {
-    return res.json({ status: "erro" });
-  }
+    // não existe
+    if (!snap.exists()) {
+      return res.json({ status: "erro" });
+    }
 
-  // expirou
-  if (Date.now() > dados.expira) {
-    return res.json({ status: "expirada" });
-  }
+    const dados = snap.data();
 
-  // primeira ativação
-  if (!dados.device) {
-    dados.device = device;
+    // expirado
+    if (Date.now() > dados.expira) {
+      return res.json({ status: "expirada" });
+    }
 
+    // primeira ativação
+    if (!dados.device) {
+      await updateDoc(ref, {
+        device: device
+      });
+
+      return res.json({
+        status: "ok",
+        expira: dados.expira
+      });
+    }
+
+    // outro aparelho
+    if (dados.device !== device) {
+      return res.json({
+        status: "bloqueada"
+      });
+    }
+
+    // mesmo aparelho
     return res.json({
       status: "ok",
       expira: dados.expira
     });
-  }
 
-  // outro aparelho
-  if (dados.device !== device) {
+  } catch (e) {
     return res.json({
-      status: "bloqueada"
+      status: "erro"
     });
   }
-
-  // mesmo aparelho
-  return res.json({
-    status: "ok",
-    expira: dados.expira
-  });
 }
