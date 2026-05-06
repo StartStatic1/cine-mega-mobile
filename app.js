@@ -44,6 +44,10 @@ async function validarChave() {
 
     try {
         const response = await fetch('./chaves.json'); 
+        
+        // Se esquecer de criar o chaves.json no Vercel, ele avisa no painel
+        if(!response.ok) throw new Error("Arquivo VIP não encontrado");
+        
         const chavesValidas = await response.json();
 
         if(chavesValidas.includes(input)) {
@@ -57,12 +61,15 @@ async function validarChave() {
         }
     } catch(e) {
         btn.innerText = "ENTRAR COM CHAVE";
-        alert("Erro de conexão com o servidor VIP.");
+        alert("Erro de conexão. Verifique se o arquivo chaves.json está no ar.");
     }
 }
 
 // Função para ligar o motor do app só quando autorizado
 function liberarApp() {
+    // A MÁGICA: Quebra o "display: flex" forçando a tela de login a sumir!
+    document.getElementById('login').style.display = 'none';
+    
     document.getElementById('login').classList.remove('active');
     document.getElementById('home').classList.add('active');
     initHero(); 
