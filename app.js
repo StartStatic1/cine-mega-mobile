@@ -38,7 +38,7 @@ async function initHero() {
     }, 5000);
 }
 
-// TODAS AS ABAS JUNTAS E TRAVADAS
+// TODAS AS ABAS JUNTAS
 async function carregarHome() {
     const pop = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('top10').innerHTML = pop.results.slice(0, 10).map((f, i) => `
@@ -73,7 +73,7 @@ async function buscar() {
     `).join('');
 }
 
-// DETALHES COMPLETOS
+// DETALHES
 async function abrir(id, isBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
@@ -94,15 +94,27 @@ async function abrir(id, isBreve = false) {
     document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// 🔥 INTENTS NATIVAS PARA APK (USANDO ASSIGN)
+// 🔥 TÉCNICA DO LINK FANTASMA (Para enganar bloqueios de APK)
 function abrirVLC() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    window.location.assign(`intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;end`);
+    const intentVLC = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(filmeAtual)};end`;
+    
+    const a = document.createElement('a');
+    a.href = intentVLC;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 function abrirMX() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    window.location.assign(`intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;end`);
+    const intentMX = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(filmeAtual)};end`;
+    
+    const a = document.createElement('a');
+    a.href = intentMX;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 initHero(); carregarHome();
