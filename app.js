@@ -3,7 +3,7 @@ const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 let heroIndex = 0;
 
-// 1. INICIALIZAÇÃO E AUTO-HERO (PASSA SOZINHO A CADA 5s)
+// 1. INICIALIZAÇÃO E AUTO-HERO COM TRANSIÇÃO SUAVE (FADE)
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
     document.getElementById('home').classList.add('active');
@@ -11,26 +11,28 @@ document.addEventListener("DOMContentLoaded", () => {
     initHero(); 
     carregarHome();
 
-    // Lógica do Hero Automático
+    // Lógica de Troca Suave (Fade)
     setInterval(() => {
-        const wrapper = document.getElementById('hero-wrapper');
         const itens = document.querySelectorAll('.hero-item');
         if (itens.length > 0) {
+            // Remove o foco da imagem atual
+            itens[heroIndex].style.opacity = "0";
+            itens[heroIndex].style.zIndex = "0";
+            
+            // Calcula a próxima
             heroIndex = (heroIndex + 1) % itens.length;
-            // Desliza suavemente sem quebrar o layout
-            wrapper.scrollTo({
-                left: wrapper.offsetWidth * heroIndex,
-                behavior: 'smooth'
-            });
+            
+            // Mostra a próxima com suavidade
+            itens[heroIndex].style.opacity = "1";
+            itens[heroIndex].style.zIndex = "1";
         }
     }, 5000);
 });
 
-// 2. BUSCA EM LISTA (PRECISÃO PARA SEQUÊNCIAS)
+// 2. BUSCA EM LISTA (FOTO + SINOPSE)
 async function buscar() {
     const q = document.getElementById("inputBusca").value.trim();
     if(q.length < 3) return;
-    
     const d = await api(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=pt-BR`);
     
     document.getElementById("resultados").innerHTML = d.results.map(f => `
@@ -44,7 +46,7 @@ async function buscar() {
     `).join('');
 }
 
-// 3. CARREGAR HOME (ORDEM: TOP, LANÇAMENTOS, EM BREVE, CLÁSSICOS, TRASH)
+// 3. CARREGAR HOME
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return {results:[]}; } }
 
 async function carregarHome() {
@@ -54,7 +56,7 @@ async function carregarHome() {
     const lan = await api(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('lancamentos').innerHTML = lan.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 
-    // EM BREVE: Trazendo os Blockbusters (Tendência mundial)
+    // EM BREVE: Filtrado por Popularidade (Blockbusters futuros)
     const hoje = new Date().toISOString().split('T')[0];
     const emb = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&primary_release_date.gte=${hoje}&sort_by=popularity.desc`);
     document.getElementById('embreve').innerHTML = emb.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id}, true)">`).join('');
@@ -66,13 +68,13 @@ async function carregarHome() {
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// 4. DETALHES (SNIPER ARCHIVE.ORG INTEGRADO)
+// 4. DETALHES (SNIPER PARA ARCHIVE.ORG)
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
     
-    // Vacina do & para bater com o título no seu Archive.org
-    filmeAtual = m.title.replace(/&/g, "e").replace(/[:]/g, "").trim();
+    // Limpeza para bater com o Archive.org (Remove caracteres que bugam a busca)
+    filmeAtual = m.title.replace(/&/g, "e").replace(/[:]/g, "").replace(/[()]/g, "").trim();
 
     document.getElementById('m-backdrop').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
@@ -87,7 +89,7 @@ async function abrir(id, isEmBreve = false) {
         btnPlay.style.background = "#222"; btnPlay.style.color = "#555";
         btnPlay.innerText = "ASSISTIR EM BREVE"; btnPlay.onclick = null;
         boxPlayers.style.display = "none";
-        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 ESTE FILME ESTÁ NOS CINEMAS E CHEGARÁ EM BREVE."; }
+        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 EM BREVE NO CINE MEGA."; }
     } else {
         btnPlay.style.background = "var(--red)"; btnPlay.style.color = "#fff";
         btnPlay.innerText = "ASSISTIR AGORA";
@@ -108,7 +110,7 @@ async function abrir(id, isEmBreve = false) {
     document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})" style="margin-right:10px;">`).join('');
 }
 
-// NAVEGAÇÃO E BOTÃO VOLTAR
+// NAVEGAÇÃO
 function ir(p, push = true) {
     if(push) history.pushState({page: p}, '');
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
@@ -123,5 +125,9 @@ window.addEventListener('popstate', (e) => {
 
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
-    document.getElementById('hero-wrapper').innerHTML = d.results.slice(0, 5).map(m => `<div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.backdrop_path})" onclick="abrir(${m.id})"><div class="hero-overlay"><h2>${m.title}</h2></div></div>`).join('');
+    document.getElementById('hero-wrapper').innerHTML = d.results.slice(0, 5).map((m, i) => `
+        <div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.backdrop_path}); opacity: ${i === 0 ? '1' : '0'}; transition: opacity 1.5s ease-in-out; position: absolute; top:0; left:0; width:100%; height:100%; z-index: ${i === 0 ? '1' : '0'};" onclick="abrir(${m.id})">
+            <div class="hero-overlay"><h2>${m.title}</h2></div>
+        </div>
+    `).join('');
 }
