@@ -1,4 +1,4 @@
-// ====== CONFIGURAÇÕES TÉCNICAS ======
+// === CONFIGURAÇÕES TÉCNICAS ======
 const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
