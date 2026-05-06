@@ -1,31 +1,34 @@
 :root { --red: #e50914; --bg: #000; }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans-serif; overflow-x:hidden; padding-bottom: 80px; }
 
-/* HERO 9:16 TRAVADO */
+/* HEADER */
+.header-app { position:fixed; top:0; width:100%; max-width:500px; height:60px; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); z-index:1000; display:flex; justify-content:space-between; align-items:center; padding:0 20px; }
+.logo { color:var(--red); font-weight:900; font-size:20px; letter-spacing:1px; }
+
+/* HERO 9:16 - TRAVADO */
 .hero-container { position:relative; width:100%; height:82vh; background:#000; }
 #hero-wrapper { display:flex; width:100%; height:100%; overflow-x:auto; scroll-snap-type: x mandatory; scrollbar-width:none; }
 .hero-item { flex:0 0 100%; height:100%; background-size:cover; background-position:center; scroll-snap-align: start; position:relative; }
-.hero-overlay { position:absolute; inset:0; background:linear-gradient(0deg, #000 12%, transparent 70%); display:flex; flex-direction:column; justify-content:flex-end; padding:40px 20px; }
+.hero-overlay { position:absolute; inset:0; background:linear-gradient(0deg, #000 15%, transparent 75%); display:flex; flex-direction:column; justify-content:flex-end; padding:40px 20px; }
+.hero-brand { color:var(--red); font-weight:900; font-size:16px; margin-bottom:5px; }
+.hero-overlay h2 { font-size:26px; margin:0; line-height:1; }
+.hero-overlay p { font-size:11px; color:#bbb; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:10px 0; }
 
 /* TOP 10 NETFLIX */
 .card-top { position:relative; min-width:145px; height:205px; flex-shrink:0; margin-left:25px; }
 .card-top img { width:100%; height:100%; object-fit:cover; border-radius:8px; border:1px solid #222; }
 .numero-fix { position:absolute; left:-25px; bottom:-15px; font-size:100px; font-weight:900; color:#000; -webkit-text-stroke: 2px #fff; z-index:10; line-height:0.8; }
 
-/* BUSCA EM LISTA (CORRIGIDO) */
+/* BUSCA EM LISTA */
 .search-row { display:flex; gap:15px; padding:15px; border-bottom:1px solid #111; align-items:center; }
-.search-row img { width:80px; height:120px; border-radius:8px; object-fit:cover; flex-shrink:0; }
+.search-row img { width:80px; height:120px; border-radius:8px; flex-shrink:0; }
 .search-info h4 { margin:0; font-size:15px; }
-.search-info p { font-size:11px; color:#888; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+.search-info p { font-size:11px; color:#777; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
 
-/* ELENCO ATORES */
-.ator-item { flex:0 0 80px; text-align:center; }
-.ator-item img { width:65px; height:65px; border-radius:50%; object-fit:cover; border:2px solid var(--red); }
-.ator-item p { font-size:9px; margin-top:5px; color:#aaa; }
+/* AVISO AMARELO */
+.aviso-estreia { background:#ffcc00; color:#000; padding:10px; border-radius:8px; font-size:11px; font-weight:900; text-align:center; margin-bottom:15px; display:none; }
 
-.row { display:flex; overflow-x:auto; gap:12px; padding-bottom:10px; scrollbar-width:none; }
+.row { display:flex; overflow-x:auto; gap:12px; padding:10px 0 20px 15px; scrollbar-width:none; }
 .card-min { min-width:120px; height:175px; flex-shrink:0; border-radius:8px; object-fit:cover; border:1px solid #222; }
-
-.page { display:none; }
-.page.active { display:block; }
+.page { display:none; } .page.active { display:block; }
