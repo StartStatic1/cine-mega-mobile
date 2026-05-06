@@ -1,12 +1,13 @@
 let CHAVES = global.CHAVES || {};
 global.CHAVES = CHAVES;
 
+// gerar código estilo VIP
 function gerarChave() {
-  return Math.random().toString(36).substring(2, 10).toUpperCase();
+  return "VIP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
 export default function handler(req, res) {
-  const { dias } = req.body;
+  const { dias = 1 } = req.body || {};
 
   const chave = gerarChave();
 
@@ -15,5 +16,5 @@ export default function handler(req, res) {
     device: null
   };
 
-  res.json({ chave });
+  return res.json({ chave });
 }
