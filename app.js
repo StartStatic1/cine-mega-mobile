@@ -77,7 +77,7 @@ async function abrir(id, isBreve = false) {
 
     const aviso = document.getElementById('aviso-embreve');
     const btnPlay = document.getElementById('btn-play-main');
-    if(isBreve) { aviso.style.display = 'block'; btnPlay.style.background = '#222'; btnPlay.innerText = "NÃO DISPONÍVEL"; btnPlay.style.pointerEvents = 'none'; }
+    if(isBreve) { aviso.style.display = 'block'; btnPlay.style.background = '#222'; btnPlay.innerText = "EM BREVE NO CINE MEGA"; btnPlay.style.pointerEvents = 'none'; }
     else { aviso.style.display = 'none'; btnPlay.style.background = '#e50914'; btnPlay.innerText = "ASSISTIR AGORA"; btnPlay.style.pointerEvents = 'auto'; }
 
     const tr = m.videos.results.find(v => v.type === "Trailer");
@@ -88,8 +88,8 @@ async function abrir(id, isBreve = false) {
 
 function abrirVLC() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    window.location.href = `vlc://${u.replace(/^https?:\/\//, '')}`;
-    setTimeout(() => { window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;scheme=http;type=video/*;package=org.videolan.vlc;end`; }, 500);
+    // 🔥 VLC SNIPER: INTENT DIRETA IGUAL AO MX (AÇÃO VIEW)
+    window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;end`;
 }
 
 function abrirMX() {
