@@ -2,10 +2,8 @@ const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 
-// BLOQUEIO DO MENU DE CONTEXTO (INSPECIONAR)
 document.addEventListener('contextmenu', event => event.preventDefault());
 
-// TRAVA DO BOTÃO VOLTAR DO ANDROID
 window.addEventListener('popstate', () => { if(document.querySelector('.page.active').id !== 'home') ir('home', false); });
 
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return null; } }
@@ -17,7 +15,6 @@ function ir(p, push = true) {
     window.scrollTo(0,0);
 }
 
-// HERO COM ROTAÇÃO A CADA 5s
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     const wrapper = document.getElementById('hero-wrapper');
@@ -38,7 +35,6 @@ async function initHero() {
     }, 5000);
 }
 
-// TODAS AS ABAS JUNTAS
 async function carregarHome() {
     const pop = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('top10').innerHTML = pop.results.slice(0, 10).map((f, i) => `
@@ -54,14 +50,13 @@ async function carregarHome() {
     const breve = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&primary_release_date.gte=2026-06-01&sort_by=popularity.desc`);
     document.getElementById('embreve').innerHTML = breve.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id}, true)">`).join('');
 
-    const cla = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&release_date.lte=1995-01-01&sort_by=vote_count.desc`);
-    document.getElementById('classicos').innerHTML = cla.results.slice(0, 15).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
-
     const trash = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=27,35&primary_release_date.gte=1980-01-01&primary_release_date.lte=1995-12-31`);
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+    
+    const cla = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&release_date.lte=1995-01-01&sort_by=vote_count.desc`);
+    document.getElementById('classicos').innerHTML = cla.results.slice(0, 15).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// BUSCA INSTANTÂNEA
 async function buscar() {
     const q = document.getElementById("inputBusca").value;
     if(!q) return;
@@ -73,7 +68,6 @@ async function buscar() {
     `).join('');
 }
 
-// DETALHES
 async function abrir(id, isBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
@@ -85,36 +79,37 @@ async function abrir(id, isBreve = false) {
 
     const aviso = document.getElementById('aviso-embreve');
     const btnPlay = document.getElementById('btn-play-main');
-    if(isBreve) { aviso.style.display = 'block'; btnPlay.style.background = '#222'; btnPlay.innerText = "NÃO DISPONÍVEL"; btnPlay.style.pointerEvents = 'none'; }
-    else { aviso.style.display = 'none'; btnPlay.style.background = '#e50914'; btnPlay.innerText = "ASSISTIR AGORA"; btnPlay.style.pointerEvents = 'auto'; }
+    const boxPlayers = document.getElementById('box-players-externos');
+    
+    // MONTANDO OS LINKS NATIVOS AQUI:
+    const urlVOD = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
+    const intentVLC = `intent://${urlVOD.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(filmeAtual)};end`;
+    const intentMX = `intent://${urlVOD.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(filmeAtual)};end`;
+
+    if(isBreve) { 
+        aviso.style.display = 'block'; 
+        btnPlay.style.background = '#222'; 
+        btnPlay.innerText = "NÃO DISPONÍVEL"; 
+        btnPlay.style.pointerEvents = 'none'; 
+        boxPlayers.style.display = 'none'; // Esconde botões extras se não lançou
+    } else { 
+        aviso.style.display = 'none'; 
+        btnPlay.style.background = '#e50914'; 
+        btnPlay.innerText = "ASSISTIR AGORA"; 
+        btnPlay.style.pointerEvents = 'auto'; 
+        
+        // INJETA OS LINKS HTML PUROS (WEBVIEW AMA ISSO)
+        boxPlayers.style.display = 'flex';
+        boxPlayers.innerHTML = `
+            <a href="${intentVLC}" style="text-decoration:none; width:55px; height:55px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px;">VLC</a>
+            <a href="${intentMX}" style="text-decoration:none; width:55px; height:55px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px;">MX</a>
+        `;
+    }
 
     const tr = m.videos.results.find(v => v.type === "Trailer");
     document.getElementById('m-trailer').innerHTML = tr ? `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${tr.key}" frameborder="0" allowfullscreen></iframe>` : '';
     document.getElementById('m-elenco').innerHTML = m.credits.cast.slice(0, 8).map(c => `<div style="flex:0 0 80px; text-align:center;"><img src="https://image.tmdb.org/t/p/w200${c.profile_path}" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid #e50914;"><p style="font-size:9px; margin-top:5px; color:#999;">${c.name}</p></div>`).join('');
     document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
-}
-
-// 🔥 TÉCNICA DO LINK FANTASMA (Para enganar bloqueios de APK)
-function abrirVLC() {
-    const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    const intentVLC = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(filmeAtual)};end`;
-    
-    const a = document.createElement('a');
-    a.href = intentVLC;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-function abrirMX() {
-    const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    const intentMX = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(filmeAtual)};end`;
-    
-    const a = document.createElement('a');
-    a.href = intentMX;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
 }
 
 initHero(); carregarHome();
