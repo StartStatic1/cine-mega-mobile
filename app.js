@@ -2,8 +2,10 @@ const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 
+// Bloqueia segurar na tela (evita copiar/inspecionar no APK)
 document.addEventListener('contextmenu', event => event.preventDefault());
 
+// Trava do botão Voltar do celular
 window.addEventListener('popstate', () => { if(document.querySelector('.page.active').id !== 'home') ir('home', false); });
 
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return null; } }
@@ -80,8 +82,8 @@ async function abrir(id, isBreve = false) {
     const aviso = document.getElementById('aviso-embreve');
     const btnPlay = document.getElementById('btn-play-main');
     const boxPlayers = document.getElementById('box-players-externos');
-    
-    // MONTANDO OS LINKS NATIVOS AQUI:
+
+    // MÁGICA PARA O APK: MONTANDO LINKS NATIVOS (TAG <a>) COM TARGET="_BLANK"
     const urlVOD = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
     const intentVLC = `intent://${urlVOD.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(filmeAtual)};end`;
     const intentMX = `intent://${urlVOD.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(filmeAtual)};end`;
@@ -91,18 +93,18 @@ async function abrir(id, isBreve = false) {
         btnPlay.style.background = '#222'; 
         btnPlay.innerText = "NÃO DISPONÍVEL"; 
         btnPlay.style.pointerEvents = 'none'; 
-        boxPlayers.style.display = 'none'; // Esconde botões extras se não lançou
+        boxPlayers.style.display = 'none'; // Esconde botões do VLC/MX
     } else { 
         aviso.style.display = 'none'; 
         btnPlay.style.background = '#e50914'; 
         btnPlay.innerText = "ASSISTIR AGORA"; 
         btnPlay.style.pointerEvents = 'auto'; 
         
-        // INJETA OS LINKS HTML PUROS (WEBVIEW AMA ISSO)
+        // INJETANDO OS LINKS HTML (A WEBVIEW NÃO BLOQUEIA ISSO)
         boxPlayers.style.display = 'flex';
         boxPlayers.innerHTML = `
-            <a href="${intentVLC}" style="text-decoration:none; width:55px; height:55px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px;">VLC</a>
-            <a href="${intentMX}" style="text-decoration:none; width:55px; height:55px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px;">MX</a>
+            <a href="${intentVLC}" target="_blank" style="text-decoration:none; width:55px; height:55px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px;">VLC</a>
+            <a href="${intentMX}" target="_blank" style="text-decoration:none; width:55px; height:55px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px;">MX</a>
         `;
     }
 
