@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="header-app"><div class="logo">CINE MEGA</div></div>
+    <div class="header-app"><div class="logo-top">CINE MEGA</div></div>
 
     <div id="home" class="page active">
         <div class="hero-container"><div id="hero-wrapper"></div></div>
@@ -16,25 +16,26 @@
         <div class="secao"><h2>🚀 LANÇAMENTOS</h2><div id="lancamentos" class="row"></div></div>
         <div class="secao"><h2>📅 EM BREVE (2026+)</h2><div id="embreve" class="row"></div></div>
         <div class="secao"><h2>🎞️ CLÁSSICOS</h2><div id="classicos" class="row"></div></div>
-        <div class="secao"><h2>💀 BAÚ DO TRASH</h2><div id="trash" class="row"></div></div>
     </div>
 
     <div id="buscaPage" class="page">
-        <div style="padding:70px 15px 10px;"><input id="inputBusca" style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;" placeholder="Digite o nome do filme..." oninput="buscar()"></div>
+        <div style="padding:70px 15px 10px;"><input id="inputBusca" style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;" placeholder="Buscar..." oninput="buscar()"></div>
         <div id="resultados"></div>
     </div>
 
     <div id="detalhes" class="page">
-        <div id="m-backdrop" style="height:35vh; background-size:cover; position:relative;"><button onclick="ir('home')" style="position:absolute; top:40px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:40px; height:40px; border-radius:50%;"><i class="fa fa-chevron-left"></i></button></div>
+        <div id="m-backdrop" class="detalhes-header">
+            <button class="btn-back-clean" onclick="ir('home')"><i class="fa fa-chevron-left"></i></button>
+        </div>
         <div style="padding:20px;">
-            <div id="aviso-embreve" class="aviso-yellow">🍿 ESTE FILME AINDA NÃO ESTREOU E NÃO ESTÁ DISPONÍVEL.</div>
+            <div id="aviso-embreve" class="aviso-yellow" style="background:#ffcc00; color:#000; padding:10px; border-radius:5px; font-weight:bold; font-size:11px; text-align:center; margin-bottom:15px; display:none;">🍿 EM BREVE NO CINE MEGA.</div>
             <div style="display:flex; gap:15px; align-items:flex-end;"><img id="m-poster" style="width:110px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:100;"><h1 id="m-titulo" style="font-size:22px;"></h1></div>
             <button id="btn-play-main" onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; color:#fff; padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0;">ASSISTIR AGORA</button>
             <div style="display:flex; justify-content:center; gap:25px;"><div onclick="abrirVLC()" style="width:60px; height:60px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; font-weight:bold;">VLC</div><div onclick="abrirMX()" style="width:60px; height:60px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; font-weight:bold;">MX</div></div>
             <h3>Sinopse</h3><p id="m-sinopse" style="color:#aaa; font-size:13px; line-height:1.5;"></p>
             <h3>Trailer</h3><div id="m-trailer"></div>
             <h3>Elenco</h3><div id="m-elenco" class="row"></div>
-            <h3>Você pode gostar</h3><div id="m-rec" class="row"></div>
+            <h3>Sugestões</h3><div id="m-rec" class="row"></div>
         </div>
     </div>
 
