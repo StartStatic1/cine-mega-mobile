@@ -12,10 +12,10 @@
 
     <div id="login" class="page active" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#000; padding:20px; z-index:9999; position:fixed; top:0; left:0; width:100%;">
         <img src="icon-192.png" style="width:100px; margin-bottom:20px; border-radius:20px;">
-        <h1 style="color:var(--red); margin:0 0 5px 0; font-size:24px;">ACESSO VIP</h1>
+        <h1 style="color:#e50914; margin:0 0 5px 0; font-size:24px;">ACESSO VIP</h1>
         <p id="msgSubtitulo" style="color:#aaa; font-size:12px; margin-bottom:25px; text-align:center;">Insira sua chave ou inicie um teste grátis.</p>
         <input id="inputChave" type="text" placeholder="CÓDIGO DE ACESSO VIP" style="width:100%; max-width:300px; padding:15px; border-radius:8px; border:1px solid #333; background:#111; color:#fff; text-align:center; margin-bottom:15px; font-weight:bold; text-transform:uppercase;">
-        <button onclick="validarChave()" style="width:100%; max-width:300px; padding:15px; background:var(--red); color:#fff; border:none; border-radius:8px; font-weight:bold; font-size:14px;">ENTRAR COM CHAVE</button>
+        <button onclick="validarChave()" style="width:100%; max-width:300px; padding:15px; background:#e50914; color:#fff; border:none; border-radius:8px; font-weight:bold; font-size:14px;">ENTRAR COM CHAVE</button>
         <button id="btnTeste" onclick="iniciarTeste()" style="width:100%; max-width:300px; padding:15px; background:#222; color:#fff; border:1px solid #444; border-radius:8px; font-weight:bold; font-size:14px; margin-top:10px;">TESTAR GRÁTIS (2 HORAS)</button>
         <p id="msgErro" style="color:#ff4444; font-size:12px; margin-top:15px; display:none; font-weight:bold; text-align:center;">❌ Chave inválida!</p>
     </div>
@@ -24,15 +24,6 @@
 
     <div id="home" class="page">
         <div class="hero-container"><div id="hero-wrapper"></div></div>
-        
-        <div class="generos-abas" style="display:flex; overflow-x:auto; gap:10px; padding:15px; scrollbar-width:none;">
-            <div class="aba-item" onclick="filtrar('acao')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Ação</div>
-            <div class="aba-item" onclick="filtrar('comedia')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Comédia</div>
-            <div class="aba-item" onclick="filtrar('terror')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Terror</div>
-            <div class="aba-item" onclick="filtrar('ficcao')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Ficção</div>
-            <div class="aba-item" onclick="filtrar('animacao')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Desenhos</div>
-        </div>
-
         <div class="secao"><h2>🔥 TOP 10 SEMANA</h2><div id="top10" class="row"></div></div>
         <div class="secao"><h2>🚀 LANÇAMENTOS</h2><div id="lancamentos" class="row"></div></div>
         <div class="secao"><h2>📅 EM BREVE (2026+)</h2><div id="embreve" class="row"></div></div>
@@ -52,7 +43,7 @@
             <div id="aviso-embreve" style="background:#ffcc00; color:#000; padding:10px; border-radius:5px; font-weight:bold; font-size:11px; text-align:center; margin-bottom:15px; display:none;">🍿 EM BREVE NO CINE MEGA.</div>
             <div style="display:flex; gap:15px; align-items:flex-end;"><img id="m-poster" style="width:110px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:100;"><h1 id="m-titulo" style="font-size:20px; margin:0;"></h1></div>
             
-            <button id="btn-play-main" onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; color:#fff; background:var(--red); padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0; text-transform:uppercase;">ASSISTIR AGORA</button>
+            <button id="btn-play-main" onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; color:#fff; background:#e50914; padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0; text-transform:uppercase;">ASSISTIR AGORA</button>
             
             <div id="box-players-externos" style="display:flex; justify-content:center; gap:25px; margin-bottom: 20px;"></div>
             
@@ -64,7 +55,7 @@
     </div>
 
     <nav style="position:fixed; bottom:0; width:100%; height:75px; background:#080808; border-top:1px solid #111; display:flex; justify-content:space-around; align-items:center; z-index:2000;">
-        <div onclick="ir('home')"><i class="fa fa-home" style="font-size:22px; color:var(--red);"></i></div>
+        <div onclick="ir('home')"><i class="fa fa-home" style="font-size:22px; color:#e50914;"></i></div>
         <div onclick="ir('buscaPage')"><i class="fa fa-search" style="font-size:22px; color:#444;"></i></div>
     </nav>
     <script src="app.js"></script>
