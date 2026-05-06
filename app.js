@@ -2,6 +2,9 @@ const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 
+// BLOQUEIA SEGURAR NA TELA (INSPECIONAR)
+document.addEventListener('contextmenu', event => event.preventDefault());
+
 window.addEventListener('popstate', () => { if(document.querySelector('.page.active').id !== 'home') ir('home', false); });
 
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return null; } }
@@ -88,7 +91,6 @@ async function abrir(id, isBreve = false) {
 
 function abrirVLC() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    // 🔥 VLC SNIPER: INTENT DIRETA IGUAL AO MX (AÇÃO VIEW)
     window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;end`;
 }
 
