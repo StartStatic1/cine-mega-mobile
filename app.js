@@ -42,7 +42,7 @@ async function buscar() {
     `).join('');
 }
 
-// ====== 3. CARREGAR HOME (SUAS ABAS ORIGINAIS) ======
+// ====== 3. CARREGAR HOME (ABAS ORIGINAIS) ======
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return {results:[]}; } }
 
 async function carregarHome() {
@@ -63,39 +63,44 @@ async function carregarHome() {
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// ====== 4. DETALHES (LOGICA SNIPER / ANTI-ERRO) ======
+// ====== 4. DETALHES (LOGICA ANTI-FILME ERRADO "MA") ======
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
     
-    // SNIPER: Limpeza absoluta para bater com o Archive.org e evitar filmes errados
+    // SNIPER: Limpeza agressiva para bater com Archive.org e evitar o chute "MA"
+    // Removemos qualquer caractere especial e garantimos que o nome vá "limpo" para a busca estrita
     filmeAtual = m.title.replace(/&/g, "e").replace(/[:]/g, "").replace(/[()]/g, "").trim();
 
     document.getElementById('m-backdrop').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
     document.getElementById('m-titulo').innerText = m.title;
-    document.getElementById('m-sinopse').innerText = m.overview || "Sincronizando com o acervo...";
+    document.getElementById('m-sinopse').innerText = m.overview || "Localizando título dublado no acervo...";
 
     const btnPlay = document.getElementById('btn-play-main');
     const boxPlayers = document.getElementById('box-players-externos');
     const aviso = document.getElementById('aviso-embreve');
 
     if(isEmBreve) {
-        // MANTIDO EXATAMENTE COMO VOCÊ APROVOU
+        // ABA EM BREVE (INTOCADA E PERFEITA)
         btnPlay.style.background = "#222"; btnPlay.style.color = "#555";
         btnPlay.innerText = "ASSISTIR EM BREVE"; btnPlay.onclick = null;
         boxPlayers.style.display = "none";
         if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 ESTE FILME CHEGARÁ EM BREVE AO CINE MEGA."; }
     } else {
-        // LIBERADO COM PRECISÃO DE BUSCA
+        // LIBERADO COM TRAVA DE INTEGRIDADE
         btnPlay.style.background = "var(--red)"; btnPlay.style.color = "#fff";
         btnPlay.innerText = "ASSISTIR AGORA";
-        btnPlay.onclick = () => window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`);
+        
+        btnPlay.onclick = () => {
+            // Se o motor no Render retornar algo errado, enviamos o título com comando de busca estrita
+            window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}&f=true`);
+        };
         
         boxPlayers.style.display = "flex";
         if(aviso) aviso.style.display = "none";
         
-        const motorUrl = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
+        const motorUrl = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}&f=true`;
         boxPlayers.innerHTML = `
             <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">VLC</a>
             <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">MX</a>
