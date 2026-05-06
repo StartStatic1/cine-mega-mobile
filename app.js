@@ -1,7 +1,13 @@
 const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
-let sliderInterval;
+
+// Gestão de Voltar (Android/Gesto)
+window.addEventListener('popstate', (e) => {
+    if (document.querySelector('.page.active').id !== 'home') {
+        ir('home');
+    }
+});
 
 async function api(url) {
     try {
@@ -11,48 +17,37 @@ async function api(url) {
 }
 
 function ir(p) {
+    history.pushState({page: p}, '');
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
     document.getElementById(p).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.dataset.page === p));
     window.scrollTo(0,0);
 }
 
-// Hero 9:16 Automático + Manual
+// Slider Suave 9:16
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
-    if(!d) return;
-    const movies = d.results.slice(0, 6);
+    const movies = d.results.slice(0, 8);
     const wrapper = document.getElementById('hero-wrapper');
     const dots = document.getElementById('hero-dots');
 
     wrapper.innerHTML = movies.map((m, i) => `
-        <div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.poster_path})">
+        <div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.poster_path})" onclick="abrir(${m.id})">
             <div class="hero-overlay">
                 <div class="hero-brand">CINE MEGA</div>
                 <h2>${m.title}</h2>
                 <div class="hero-meta"><span>${m.release_date.split('-')[0]}</span> • <span>⭐ ${m.vote_average.toFixed(1)}</span></div>
                 <p>${m.overview}</p>
-                <button onclick="abrir(${m.id})" class="btn-hero-play">▶ ASSISTIR AGORA</button>
             </div>
         </div>
     `).join('');
 
     dots.innerHTML = movies.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join('');
 
-    const startAuto = () => {
-        sliderInterval = setInterval(() => {
-            let next = (wrapper.scrollLeft + wrapper.offsetWidth) >= wrapper.scrollWidth ? 0 : wrapper.scrollLeft + wrapper.offsetWidth;
-            wrapper.scrollTo({ left: next, behavior: 'smooth' });
-        }, 6000);
-    };
-
     wrapper.addEventListener('scroll', () => {
         const idx = Math.round(wrapper.scrollLeft / wrapper.offsetWidth);
         document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
     });
-
-    wrapper.addEventListener('touchstart', () => clearInterval(sliderInterval));
-    wrapper.addEventListener('touchend', startAuto);
-    startAuto();
 }
 
 async function carregarHome() {
@@ -64,14 +59,18 @@ async function carregarHome() {
         </div>
     `).join('');
 
-    const lan = await api(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=pt-BR`);
-    document.getElementById('lancamentos').innerHTML = lan.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+    // ABAS DE GÊNERO (RESGATADAS)
+    const cla = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&release_date.lte=1995-01-01&sort_by=vote_count.desc`);
+    document.getElementById('classicos').innerHTML = cla.results.slice(0, 15).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 
-    const breve = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&primary_release_date.gte=2026-06-01&sort_by=popularity.desc`);
-    document.getElementById('embreve').innerHTML = breve.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+    const trash = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=27,35&primary_release_date.gte=1980-01-01&primary_release_date.lte=1995-12-31`);
+    document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+    
+    const comed = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=35&sort_by=popularity.desc`);
+    document.getElementById('comedia').innerHTML = comed.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// Busca Padronizada (Mini Foto + Sinopse)
+// BUSCA "AO VIVO"
 async function buscar() {
     const q = document.getElementById("inputBusca").value;
     if(!q) return;
@@ -87,7 +86,6 @@ async function buscar() {
     `).join('');
 }
 
-// Detalhes com Trailer e Sugestões
 async function abrir(id) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,recommendations`);
@@ -96,16 +94,13 @@ async function abrir(id) {
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
     document.getElementById('m-titulo').innerText = m.title;
     document.getElementById('m-sinopse').innerText = m.overview;
-
+    document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+    
     const tr = m.videos.results.find(v => v.type === "Trailer");
     document.getElementById('m-trailer').innerHTML = tr ? `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${tr.key}" frameborder="0" allowfullscreen></iframe>` : '';
-
-    document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `
-        <img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">
-    `).join('');
 }
 
-// Intents Sniper
+// PLAYERS (VLC E MX SNIPER)
 function abrirVLC() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
     window.location.href = `vlc://${u.replace(/^https?:\/\//, '')}`;
@@ -114,7 +109,7 @@ function abrirVLC() {
 
 function abrirMX() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;scheme=http;package=com.mxtech.videoplayer.ad;end`;
+    window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;end`;
 }
 
 initHero();
