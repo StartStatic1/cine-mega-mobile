@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initHero(); 
     carregarHome();
 
+    // Troca de imagem suave (Fade) a cada 5s
     setInterval(() => {
         const itens = document.querySelectorAll('.hero-item');
         if (itens.length > 0) {
@@ -41,7 +42,7 @@ async function buscar() {
     `).join('');
 }
 
-// ====== 3. CARREGAR HOME ======
+// ====== 3. CARREGAR HOME (SUAS ABAS ORIGINAIS) ======
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return {results:[]}; } }
 
 async function carregarHome() {
@@ -62,39 +63,35 @@ async function carregarHome() {
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// ====== 4. DETALHES (LOGICA ANTI-FILME ERRADO / SNIPER) ======
+// ====== 4. DETALHES (LOGICA SNIPER / ANTI-ERRO) ======
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
     
-    // LIMPEZA SNIPER: Remove tudo que confunde o motor (evita o erro do filme "MA")
+    // SNIPER: Limpeza absoluta para bater com o Archive.org e evitar filmes errados
     filmeAtual = m.title.replace(/&/g, "e").replace(/[:]/g, "").replace(/[()]/g, "").trim();
 
     document.getElementById('m-backdrop').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
     document.getElementById('m-titulo').innerText = m.title;
-    document.getElementById('m-sinopse').innerText = m.overview || "Localizando nos servidores...";
+    document.getElementById('m-sinopse').innerText = m.overview || "Sincronizando com o acervo...";
 
     const btnPlay = document.getElementById('btn-play-main');
     const boxPlayers = document.getElementById('box-players-externos');
     const aviso = document.getElementById('aviso-embreve');
 
     if(isEmBreve) {
+        // MANTIDO EXATAMENTE COMO VOCÊ APROVOU
         btnPlay.style.background = "#222"; btnPlay.style.color = "#555";
-        btnPlay.innerText = "BUSCANDO NO ACERVO"; btnPlay.onclick = null;
+        btnPlay.innerText = "ASSISTIR EM BREVE"; btnPlay.onclick = null;
         boxPlayers.style.display = "none";
-        if(aviso) { aviso.style.display = "block"; aviso.innerText = "⏳ PROCESSANDO PARA O CATÁLOGO M3U/ARCHIVE."; }
+        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 ESTE FILME CHEGARÁ EM BREVE AO CINE MEGA."; }
     } else {
+        // LIBERADO COM PRECISÃO DE BUSCA
         btnPlay.style.background = "var(--red)"; btnPlay.style.color = "#fff";
         btnPlay.innerText = "ASSISTIR AGORA";
+        btnPlay.onclick = () => window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`);
         
-        // Lógica para evitar abrir filme errado quando não existe
-        btnPlay.onclick = () => {
-            // Se o título for muito curto ou genérico, o motor pode errar. 
-            // Enviamos o título exato para forçar o Sniper.
-            window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`);
-        };
-
         boxPlayers.style.display = "flex";
         if(aviso) aviso.style.display = "none";
         
