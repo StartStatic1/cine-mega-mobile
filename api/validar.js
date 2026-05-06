@@ -1,29 +1,29 @@
-let CHAVES = {
-  VIP123: {
-    expira: Date.now() + (2 * 86400000),
-    usado: false,
-    device: null
-  }
-};
+let CHAVES = global.CHAVES || {};
+global.CHAVES = CHAVES;
 
 export default function handler(req, res) {
   const { chave, device } = req.query;
 
+  // não enviou chave
+  if (!chave) {
+    return res.json({ status: "erro" });
+  }
+
   const dados = CHAVES[chave];
 
+  // chave não existe
   if (!dados) {
     return res.json({ status: "erro" });
   }
 
-  // expirado
+  // expirou
   if (Date.now() > dados.expira) {
     return res.json({ status: "expirada" });
   }
 
-  // primeira vez
+  // primeira ativação
   if (!dados.device) {
     dados.device = device;
-    dados.usado = true;
 
     return res.json({
       status: "ok",
@@ -31,9 +31,11 @@ export default function handler(req, res) {
     });
   }
 
-  // já usada em outro aparelho
+  // outro aparelho
   if (dados.device !== device) {
-    return res.json({ status: "bloqueada" });
+    return res.json({
+      status: "bloqueada"
+    });
   }
 
   // mesmo aparelho
