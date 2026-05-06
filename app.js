@@ -1,38 +1,36 @@
+// ====== CONFIGURAÇÕES TÉCNICAS ======
 const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 let heroIndex = 0;
 
-// 1. INICIALIZAÇÃO E AUTO-HERO COM TRANSIÇÃO SUAVE (FADE)
+// ====== 1. INICIALIZAÇÃO E AUTO-HERO (FADE SUAVE) ======
 document.addEventListener("DOMContentLoaded", () => {
+    // Garante que o app abra na Home
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
     document.getElementById('home').classList.add('active');
     
     initHero(); 
     carregarHome();
 
-    // Lógica de Troca Suave (Fade)
+    // Timer do Hero: Troca de imagem com Fade (Opacidade) a cada 5s
     setInterval(() => {
         const itens = document.querySelectorAll('.hero-item');
         if (itens.length > 0) {
-            // Remove o foco da imagem atual
             itens[heroIndex].style.opacity = "0";
             itens[heroIndex].style.zIndex = "0";
-            
-            // Calcula a próxima
             heroIndex = (heroIndex + 1) % itens.length;
-            
-            // Mostra a próxima com suavidade
             itens[heroIndex].style.opacity = "1";
             itens[heroIndex].style.zIndex = "1";
         }
     }, 5000);
 });
 
-// 2. BUSCA EM LISTA (FOTO + SINOPSE)
+// ====== 2. BUSCA EM LISTA (PRECISÃO SNIPER) ======
 async function buscar() {
     const q = document.getElementById("inputBusca").value.trim();
     if(q.length < 3) return;
+    
     const d = await api(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=pt-BR`);
     
     document.getElementById("resultados").innerHTML = d.results.map(f => `
@@ -46,7 +44,7 @@ async function buscar() {
     `).join('');
 }
 
-// 3. CARREGAR HOME
+// ====== 3. CARREGAR HOME (ORDEM E BLOCKBUSTERS) ======
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return {results:[]}; } }
 
 async function carregarHome() {
@@ -56,7 +54,7 @@ async function carregarHome() {
     const lan = await api(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('lancamentos').innerHTML = lan.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 
-    // EM BREVE: Filtrado por Popularidade (Blockbusters futuros)
+    // EM BREVE: Blockbusters Futuros (Ordenados por Popularidade)
     const hoje = new Date().toISOString().split('T')[0];
     const emb = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&primary_release_date.gte=${hoje}&sort_by=popularity.desc`);
     document.getElementById('embreve').innerHTML = emb.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id}, true)">`).join('');
@@ -68,32 +66,35 @@ async function carregarHome() {
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// 4. DETALHES (SNIPER PARA ARCHIVE.ORG)
+// ====== 4. DETALHES (SNIPER + TRAVA DE SEGURANÇA) ======
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
     
-    // Limpeza para bater com o Archive.org (Remove caracteres que bugam a busca)
+    // VACINA SNIPER: Limpeza total para bater com o seu Archive.org
     filmeAtual = m.title.replace(/&/g, "e").replace(/[:]/g, "").replace(/[()]/g, "").trim();
 
     document.getElementById('m-backdrop').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
     document.getElementById('m-titulo').innerText = m.title;
-    document.getElementById('m-sinopse').innerText = m.overview || "Informações em breve.";
+    document.getElementById('m-sinopse').innerText = m.overview || "Estamos sincronizando as informações deste título...";
 
     const btnPlay = document.getElementById('btn-play-main');
     const boxPlayers = document.getElementById('box-players-externos');
     const aviso = document.getElementById('aviso-embreve');
 
     if(isEmBreve) {
+        // Estilo Indisponível (Em Breve)
         btnPlay.style.background = "#222"; btnPlay.style.color = "#555";
         btnPlay.innerText = "ASSISTIR EM BREVE"; btnPlay.onclick = null;
         boxPlayers.style.display = "none";
-        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 EM BREVE NO CINE MEGA."; }
+        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 ESTE FILME CHEGARÁ EM BREVE AO CINE MEGA."; }
     } else {
+        // Estilo Liberado
         btnPlay.style.background = "var(--red)"; btnPlay.style.color = "#fff";
         btnPlay.innerText = "ASSISTIR AGORA";
         btnPlay.onclick = () => window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`);
+        
         boxPlayers.style.display = "flex";
         if(aviso) aviso.style.display = "none";
         
@@ -110,7 +111,7 @@ async function abrir(id, isEmBreve = false) {
     document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})" style="margin-right:10px;">`).join('');
 }
 
-// NAVEGAÇÃO
+// ====== 5. NAVEGAÇÃO E VOLTAR DO ANDROID ======
 function ir(p, push = true) {
     if(push) history.pushState({page: p}, '');
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
