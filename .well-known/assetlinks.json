@@ -1,0 +1,8 @@
+[{
+   "relation": ["delegate_permission/common.handle_all_urls"],
+   "target": {
+     "namespace": "android_app",
+     "package_name": "com.cinemegapocket.app",
+     "sha256_cert_fingerprints": ["33:9A:70:AD:B5:57:32:2E:35:7C:72:86:FC:3D:BF:72:CF:A9:88:51:FA:3B:C3:DD:DA:03:30:40:0D:56:BF:75"]
+   }
+}]
