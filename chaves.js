@@ -1,4 +1,4 @@
-// ====== CHAVES (EDITA AQUI SEM MEXER NO APP) ======
+// ====== CHAVES ======
 const CHAVES_VALIDAS = [
     "VIP123",
     "MEGA2026",
@@ -6,8 +6,35 @@ const CHAVES_VALIDAS = [
 ];
 
 
-// ====== SISTEMA DE BLOQUEIO (SEPARADO DO APP) ======
-document.addEventListener("DOMContentLoaded", () => {
+// ====== FUNÇÕES GLOBAIS (BOTÕES FUNCIONAM 100%) ======
+function validarChave(){
+    const input = document.getElementById("inputChave");
+    const erro = document.getElementById("msgErro");
+
+    const chave = input.value.trim().toUpperCase();
+
+    if(CHAVES_VALIDAS.includes(chave)){
+        localStorage.setItem("cm_exp", Date.now() + (30 * 24 * 60 * 60 * 1000));
+        document.getElementById("login").style.display = "none";
+    } else {
+        erro.style.display = "block";
+    }
+}
+
+function iniciarTeste(){
+    if(localStorage.getItem("cm_test")){
+        alert("Teste já usado!");
+        return;
+    }
+
+    localStorage.setItem("cm_test", "1");
+    localStorage.setItem("cm_exp", Date.now() + (2 * 60 * 60 * 1000));
+    document.getElementById("login").style.display = "none";
+}
+
+
+// ====== BLOQUEIO (RODA DEPOIS DO APP) ======
+window.addEventListener("load", () => {
 
     const login = document.getElementById("login");
 
@@ -17,39 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return Date.now() > parseInt(exp);
     }
 
-    function liberar(){
-        login.style.display = "none";
-    }
-
-    window.validarChave = function(){
-        const chave = document.getElementById("inputChave").value.trim().toUpperCase();
-
-        if(CHAVES_VALIDAS.includes(chave)){
-            localStorage.setItem("cm_exp", Date.now() + (30 * 24 * 60 * 60 * 1000));
-            liberar();
-        } else {
-            document.getElementById("msgErro").style.display = "block";
-        }
-    }
-
-    window.iniciarTeste = function(){
-        if(localStorage.getItem("cm_test")){
-            alert("Teste já usado!");
-            return;
-        }
-
-        localStorage.setItem("cm_test", "1");
-        localStorage.setItem("cm_exp", Date.now() + (2 * 60 * 60 * 1000));
-        liberar();
-    }
-
-    // 👇 ESSA LINHA É A CHAVE DO PROBLEMA QUE RESOLVEU
+    // espera app renderizar TOTAL
     setTimeout(() => {
         if(bloqueado()){
             login.style.display = "flex";
         } else {
-            liberar();
+            login.style.display = "none";
         }
-    }, 800); // espera app carregar primeiro
+    }, 500);
 
 });
