@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const API_URL = "/api/validar"; // Vercel usa rota interna
+const API_URL = "/api/validar";
 
 // ===== FINGERPRINT =====
 function getDeviceId() {
@@ -44,36 +44,47 @@ function lerDados() {
     }
 }
 
-// ===== LOGIN (AGORA ONLINE) =====
+// ===== LOGIN (API ONLINE) =====
 async function _cm_login() {
     const input = document.getElementById("inputChave");
     const erro = document.getElementById("msgErro");
 
     const chave = input.value.trim().toUpperCase();
+    const device = getDeviceId();
 
     erro.style.display = "none";
 
     try {
-        const r = await fetch(`${API_URL}?chave=${chave}`);
+        const r = await fetch(`${API_URL}?chave=${chave}&device=${device}`);
         const d = await r.json();
 
         if (d.status === "ok") {
             salvarDados(d.expira);
             fecharLogin();
-        } else {
+        } 
+        else if (d.status === "bloqueada") {
+            erro.innerText = "🚫 Chave já usada em outro aparelho";
+            erro.style.display = "block";
+        }
+        else if (d.status === "expirada") {
+            erro.innerText = "⏳ Chave expirada";
+            erro.style.display = "block";
+        }
+        else {
             erro.innerText = "❌ Chave inválida!";
             erro.style.display = "block";
         }
+
     } catch (e) {
-        erro.innerText = "⚠️ Erro conexão";
+        erro.innerText = "⚠️ Erro de conexão com servidor";
         erro.style.display = "block";
     }
 }
 
-// ===== TESTE =====
+// ===== TESTE (2H) =====
 function _cm_test() {
     const agora = Date.now();
-    const expira = agora + (2 * 60 * 60 * 1000); // 2h
+    const expira = agora + (2 * 60 * 60 * 1000); // 2 horas
     salvarDados(expira);
     fecharLogin();
 }
@@ -83,16 +94,19 @@ function verificarAcesso() {
     const dados = lerDados();
     const agora = Date.now();
 
+    // nunca logou
     if (!dados.expira) {
         abrirLogin();
         return;
     }
 
+    // aparelho diferente
     if (dados.device !== getDeviceId()) {
         bloquear();
         return;
     }
 
+    // expirado
     if (agora > dados.expira) {
         abrirLogin();
         return;
@@ -104,6 +118,7 @@ function verificarAcesso() {
 // ===== BLOQUEIO =====
 function bloquear() {
     const login = document.getElementById("login");
+
     login.style.display = "flex";
     login.innerHTML = `
         <h2 style="color:red;text-align:center;">
