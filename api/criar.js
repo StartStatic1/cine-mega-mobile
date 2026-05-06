@@ -7,8 +7,7 @@ function gerarChave() {
 }
 
 export default function handler(req, res) {
-  const { dias = 1 } = req.body || {};
-
+  const dias = parseFloat(req.body.dias) || 1;
   const chave = gerarChave();
 
   CHAVES[chave] = {
