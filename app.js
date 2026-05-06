@@ -2,6 +2,7 @@ const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 
+// Backstack para não sair do app
 window.addEventListener('popstate', () => { if(document.querySelector('.page.active').id !== 'home') ir('home', false); });
 
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return null; } }
@@ -20,7 +21,7 @@ async function initHero() {
         <div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.poster_path})" onclick="abrir(${m.id})">
             <div class="hero-overlay">
                 <h2>${m.title}</h2>
-                <div style="font-size:11px; color:#ffcc00; margin:5px 0; font-weight:bold;">⭐ ${m.vote_average.toFixed(1)}</div>
+                <div style="font-size:10px; color:#ffcc00; margin:4px 0; font-weight:bold;">⭐ ${m.vote_average.toFixed(1)}</div>
                 <p>${m.overview}</p>
             </div>
         </div>
@@ -48,6 +49,9 @@ async function carregarHome() {
     const breve = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&primary_release_date.gte=2026-06-01&sort_by=popularity.desc`);
     document.getElementById('embreve').innerHTML = breve.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id}, true)">`).join('');
 
+    const trash = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=27,35&primary_release_date.gte=1980-01-01&primary_release_date.lte=1995-12-31`);
+    document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+    
     const cla = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&release_date.lte=1995-01-01&sort_by=vote_count.desc`);
     document.getElementById('classicos').innerHTML = cla.results.slice(0, 15).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
@@ -74,7 +78,7 @@ async function abrir(id, isBreve = false) {
 
     const aviso = document.getElementById('aviso-embreve');
     const btnPlay = document.getElementById('btn-play-main');
-    if(isBreve) { aviso.style.display = 'block'; btnPlay.style.background = '#333'; btnPlay.innerText = "NÃO DISPONÍVEL"; btnPlay.style.pointerEvents = 'none'; }
+    if(isBreve) { aviso.style.display = 'block'; btnPlay.style.background = '#222'; btnPlay.innerText = "EM BREVE NO CINE MEGA"; btnPlay.style.pointerEvents = 'none'; }
     else { aviso.style.display = 'none'; btnPlay.style.background = '#e50914'; btnPlay.innerText = "ASSISTIR AGORA"; btnPlay.style.pointerEvents = 'auto'; }
 
     const tr = m.videos.results.find(v => v.type === "Trailer");
@@ -85,7 +89,7 @@ async function abrir(id, isBreve = false) {
 
 function abrirVLC() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;scheme=http;type=video/*;package=org.videolan.vlc;end`;
+    window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;scheme=http;package=org.videolan.vlc;end`;
 }
 
 function abrirMX() {
