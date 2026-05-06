@@ -1,0 +1,6 @@
+const CHAVES_VALIDAS = [
+    "CINEMEGA2026",
+    "VIP123",
+    "TESTE999",
+    "ACESSOILIMITADO"
+];
