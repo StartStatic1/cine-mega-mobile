@@ -1,38 +1,27 @@
 :root { --red: #e50914; --bg: #000; }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans-serif; overflow-x:hidden; padding-bottom: 80px; }
 
-/* HEADER */
-.header-app { position:fixed; top:0; width:100%; max-width:500px; height:60px; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); z-index:1000; display:flex; justify-content:space-between; align-items:center; padding:0 20px; }
+/* HEADER LIMPO */
+.header-simple { position:fixed; top:0; width:100%; height:60px; background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); z-index:1000; display:flex; align-items:center; padding:0 20px; }
 .logo { color:var(--red); font-weight:900; font-size:22px; }
 
-/* HERO 9:16 - IMERSIVO */
-.hero-container { position:relative; width:100%; height:82vh; overflow:hidden; }
-#hero-wrapper { display:flex; width:100%; height:100%; overflow-x:auto; scroll-snap-type: x mandatory; scrollbar-width:none; }
+/* SLIDER 9:16 SMOOTH */
+.hero-container { position:relative; width:100%; height:85vh; background:#000; }
+#hero-wrapper { display:flex; width:100%; height:100%; overflow-x:auto; scroll-snap-type: x mandatory; scrollbar-width:none; -webkit-overflow-scrolling: touch; }
 .hero-item { flex:0 0 100%; height:100%; background-size:cover; background-position:center; scroll-snap-align: start; position:relative; }
-.hero-overlay { position:absolute; inset:0; background:linear-gradient(0deg, #000 15%, transparent 75%); display:flex; flex-direction:column; justify-content:flex-end; padding:40px 20px; }
-.hero-brand { color:var(--red); font-weight:900; font-size:16px; margin-bottom:10px; }
-.btn-hero-play { background:var(--red); color:#fff; border:none; padding:15px; border-radius:10px; font-weight:bold; margin-top:15px; }
+.hero-overlay { position:absolute; inset:0; background:linear-gradient(0deg, #000 12%, transparent 70%); display:flex; flex-direction:column; justify-content:flex-end; padding:40px 20px; }
 
-/* TOP 10 NETFLIX STYLE */
+/* TOP 10 */
 .card-top { position:relative; min-width:145px; height:205px; flex-shrink:0; margin-left:25px; }
 .card-top img { width:100%; height:100%; object-fit:cover; border-radius:8px; border:1px solid #222; }
 .numero-fix { position:absolute; left:-25px; bottom:-15px; font-size:100px; font-weight:900; color:#000; -webkit-text-stroke: 2px #fff; z-index:10; line-height:0.8; }
 
-/* BUSCA EM LISTA (FOTO PEQUENA + SINOPSE) */
-.search-row { display:flex; gap:15px; padding:15px; border-bottom: 1px solid #111; align-items: center; }
-.search-row img { width:80px; height:120px; border-radius:8px; object-fit:cover; flex-shrink:0; }
-.search-info h4 { margin:0; font-size:15px; color:#fff; }
-.search-info p { font-size:11px; color:#888; display:-webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin-top:5px; }
+/* NAV BAR INFERIOR */
+.nav-bottom { position:fixed; bottom:0; width:100%; height:75px; background:#080808; border-top:1px solid #1a1a1a; display:flex; justify-content:space-around; align-items:center; z-index:2000; }
+.nav-item { color:#555; text-align:center; font-size:11px; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
+.nav-item.active { color:var(--red); }
+.nav-item i { font-size:22px; margin-bottom:4px; }
 
-/* CARROSSEL PADRÃO */
-.secao { padding:25px 0 0 15px; }
-.row { display:flex; overflow-x:auto; gap:12px; padding-bottom:15px; scrollbar-width:none; }
-.card-min { min-width:120px; height:175px; flex-shrink:0; border-radius:8px; object-fit:cover; border:1px solid #222; }
-
-/* DETALHES VOD */
-.detalhes-body { padding:20px; }
-.btn-circle { width:60px; height:60px; border-radius:50%; border:none; color:#fff; font-weight:bold; display:flex; align-items:center; justify-content:center; }
-
-.page { display:none; padding-top:60px; }
+.page { display:none; }
 .page.active { display:block; }
