@@ -14,13 +14,9 @@
         <img src="icon-192.png" style="width:100px; margin-bottom:20px; border-radius:20px;">
         <h1 style="color:var(--red); margin:0 0 5px 0; font-size:24px;">ACESSO VIP</h1>
         <p id="msgSubtitulo" style="color:#aaa; font-size:12px; margin-bottom:25px; text-align:center;">Insira sua chave ou inicie um teste grátis.</p>
-        
         <input id="inputChave" type="text" placeholder="CÓDIGO DE ACESSO VIP" style="width:100%; max-width:300px; padding:15px; border-radius:8px; border:1px solid #333; background:#111; color:#fff; text-align:center; margin-bottom:15px; font-weight:bold; text-transform:uppercase;">
-        
         <button onclick="validarChave()" style="width:100%; max-width:300px; padding:15px; background:var(--red); color:#fff; border:none; border-radius:8px; font-weight:bold; font-size:14px;">ENTRAR COM CHAVE</button>
-        
         <button id="btnTeste" onclick="iniciarTeste()" style="width:100%; max-width:300px; padding:15px; background:#222; color:#fff; border:1px solid #444; border-radius:8px; font-weight:bold; font-size:14px; margin-top:10px;">TESTAR GRÁTIS (2 HORAS)</button>
-        
         <p id="msgErro" style="color:#ff4444; font-size:12px; margin-top:15px; display:none; font-weight:bold; text-align:center;">❌ Chave inválida!</p>
     </div>
 
@@ -28,6 +24,15 @@
 
     <div id="home" class="page">
         <div class="hero-container"><div id="hero-wrapper"></div></div>
+        
+        <div class="generos-abas" style="display:flex; overflow-x:auto; gap:10px; padding:15px; scrollbar-width:none;">
+            <div class="aba-item" onclick="filtrar('acao')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Ação</div>
+            <div class="aba-item" onclick="filtrar('comedia')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Comédia</div>
+            <div class="aba-item" onclick="filtrar('terror')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Terror</div>
+            <div class="aba-item" onclick="filtrar('ficcao')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Ficção</div>
+            <div class="aba-item" onclick="filtrar('animacao')" style="flex:0 0 auto; padding:8px 20px; background:#111; border-radius:50px; font-size:11px; font-weight:bold; color:#fff; border:1px solid #222;">Desenhos</div>
+        </div>
+
         <div class="secao"><h2>🔥 TOP 10 SEMANA</h2><div id="top10" class="row"></div></div>
         <div class="secao"><h2>🚀 LANÇAMENTOS</h2><div id="lancamentos" class="row"></div></div>
         <div class="secao"><h2>📅 EM BREVE (2026+)</h2><div id="embreve" class="row"></div></div>
@@ -36,9 +41,7 @@
     </div>
 
     <div id="buscaPage" class="page">
-        <div style="padding:70px 15px 10px;">
-            <input id="inputBusca" style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;" placeholder="Pesquisar filme..." oninput="buscar()">
-        </div>
+        <div style="padding:70px 15px 10px;"><input id="inputBusca" style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;" placeholder="Pesquisar filme..." oninput="buscar()"></div>
         <div id="resultados"></div>
     </div>
 
@@ -47,29 +50,16 @@
         <div id="m-backdrop" class="detalhes-header"></div>
         <div style="padding:20px;">
             <div id="aviso-embreve" style="background:#ffcc00; color:#000; padding:10px; border-radius:5px; font-weight:bold; font-size:11px; text-align:center; margin-bottom:15px; display:none;">🍿 EM BREVE NO CINE MEGA.</div>
+            <div style="display:flex; gap:15px; align-items:flex-end;"><img id="m-poster" style="width:110px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:100;"><h1 id="m-titulo" style="font-size:20px; margin:0;"></h1></div>
             
-            <div style="display:flex; gap:15px; align-items:flex-end;">
-                <img id="m-poster" style="width:110px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:100;">
-                <h1 id="m-titulo" style="font-size:20px; margin:0;"></h1>
-            </div>
-            
-            <button id="btn-play-main" onclick="playNoMotor()" style="width:100%; color:#fff; background:var(--red); padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0; text-transform:uppercase; display:block;">ASSISTIR AGORA</button>
+            <button id="btn-play-main" onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; color:#fff; background:var(--red); padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0; text-transform:uppercase;">ASSISTIR AGORA</button>
             
             <div id="box-players-externos" style="display:flex; justify-content:center; gap:25px; margin-bottom: 20px;"></div>
             
-            <div class="secao-info">
-                <h3 style="font-size:14px; color:var(--red);">Sinopse</h3>
-                <p id="m-sinopse" style="color:#aaa; font-size:12px; line-height:1.5; margin-bottom:20px;"></p>
-                
-                <h3 style="font-size:14px; color:var(--red);">Trailer</h3>
-                <div id="m-trailer" style="margin-bottom:20px;"></div>
-                
-                <h3 style="font-size:14px; color:var(--red);">Elenco</h3>
-                <div id="m-elenco" class="row"></div>
-                
-                <h3 style="font-size:14px; color:var(--red);">Você também pode gostar</h3>
-                <div id="m-rec" class="row"></div>
-            </div>
+            <h3>Sinopse</h3><p id="m-sinopse" style="color:#aaa; font-size:12px; line-height:1.5;"></p>
+            <h3>Trailer</h3><div id="m-trailer"></div>
+            <h3>Elenco</h3><div id="m-elenco" class="row"></div>
+            <h3>Você também pode gostar</h3><div id="m-rec" class="row"></div>
         </div>
     </div>
 
@@ -77,7 +67,6 @@
         <div onclick="ir('home')"><i class="fa fa-home" style="font-size:22px; color:var(--red);"></i></div>
         <div onclick="ir('buscaPage')"><i class="fa fa-search" style="font-size:22px; color:#444;"></i></div>
     </nav>
-
     <script src="app.js"></script>
 </body>
 </html>
