@@ -1,55 +1,11 @@
-// ====== 🔒 BLOQUEIO CINE MEGA (ADICIONADO NO TOPO) ======
-function validarChave(){
-    const chave = document.getElementById("inputChave").value.trim().toUpperCase();
-
-    if(typeof CHAVES_VALIDAS !== "undefined" && CHAVES_VALIDAS.includes(chave)){
-        localStorage.setItem("cm_key", chave);
-        localStorage.setItem("cm_exp", Date.now() + (30 * 24 * 60 * 60 * 1000));
-        liberarApp();
-    } else {
-        document.getElementById("msgErro").style.display = "block";
-    }
-}
-
-function iniciarTeste(){
-    if(localStorage.getItem("cm_test")){
-        alert("Teste já usado!");
-        return;
-    }
-
-    localStorage.setItem("cm_test", "1");
-    localStorage.setItem("cm_exp", Date.now() + (2 * 60 * 60 * 1000));
-    liberarApp();
-}
-
-function bloqueioAtivo(){
-    const exp = localStorage.getItem("cm_exp");
-    if(!exp) return true;
-    return Date.now() > parseInt(exp);
-}
-
-function liberarApp(){
-    document.getElementById("login").style.display = "none";
-}
-
-
 // ====== CONFIGURAÇÕES TÉCNICAS ======
 const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 let heroIndex = 0;
 
-
-// ====== 1. INICIALIZAÇÃO (SÓ ADICIONEI BLOQUEIO AQUI) ======
+// ====== 1. INICIALIZAÇÃO E AUTO-HERO (FADE + INFO NO RODAPÉ) ======
 document.addEventListener("DOMContentLoaded", () => {
-
-    // 🔒 BLOQUEIO
-    if(bloqueioAtivo()){
-        document.getElementById("login").style.display = "flex";
-    } else {
-        liberarApp();
-    }
-
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
     document.getElementById('home').classList.add('active');
     initHero(); 
@@ -67,8 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000);
 });
 
-
-// ====== 2. BUSCA EM LISTA (SEU ORIGINAL INTACTO) ======
+// ====== 2. BUSCA EM LISTA (FOTO + SINOPSE) ======
 async function buscar() {
     const q = document.getElementById("inputBusca").value.trim();
     if(q.length < 3) return;
@@ -84,7 +39,6 @@ async function buscar() {
         </div>
     `).join('');
 }
-
 
 // ====== 3. CARREGAR HOME ======
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return {results:[]}; } }
@@ -107,8 +61,7 @@ async function carregarHome() {
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-
-// ====== 4. DETALHES (SEU ORIGINAL COMPLETO) ======
+// ====== 4. DETALHES (SNIPER) ======
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
@@ -138,8 +91,8 @@ async function abrir(id, isEmBreve = false) {
         
         const motorUrl = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
         boxPlayers.innerHTML = `
-            <a href="intent://${motorUrl.replace(/^https?:\\/\\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">VLC</a>
-            <a href="intent://${motorUrl.replace(/^https?:\\/\\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">MX</a>
+            <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">VLC</a>
+            <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">MX</a>
         `;
     }
 
@@ -148,7 +101,6 @@ async function abrir(id, isEmBreve = false) {
     document.getElementById('m-elenco').innerHTML = m.credits.cast.slice(0, 8).map(c => `<div style="flex:0 0 75px; text-align:center;"><img src="https://image.tmdb.org/t/p/w200${c.profile_path}" style="width:55px; height:55px; border-radius:50%; object-fit:cover; border:2px solid var(--red);"><p style="font-size:8px; color:#999; margin-top:5px;">${c.name}</p></div>`).join('');
     document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})" style="margin-right:10px;">`).join('');
 }
-
 
 // ====== 5. NAVEGAÇÃO ======
 function ir(p, push = true) {
@@ -163,8 +115,7 @@ window.addEventListener('popstate', (e) => {
     ir(p, false);
 });
 
-
-// ====== 6. HERO ======
+// ====== 6. HERO REVISADO (INFO NO RODAPÉ + DEGRADÊ) ======
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('hero-wrapper').innerHTML = d.results.slice(0, 6).map((m, i) => `
@@ -182,11 +133,12 @@ async function initHero() {
                 
                 <h2 style="margin:0 0 5px; font-size:22px; color:#fff; font-weight: bold; text-shadow: 2px 2px 5px #000;">${m.title}</h2>
                 
-                <div style="font-size:11px; color:#ffcc00; font-weight:bold; margin-bottom:6px;">
-                    ⭐ ${m.vote_average.toFixed(1)} | ${m.release_date.split('-')[0]}
+                <div style="font-size:11px; color:#ffcc00; font-weight:bold; margin-bottom:6px; text-shadow: 1px 1px 3px #000;">
+                    <i class="fa fa-star"></i> ${m.vote_average.toFixed(1)} | ${m.release_date.split('-')[0]}
                 </div>
 
-                <p style="font-size:11px; color:#ccc; max-width:85%; display:-webkit-box; -webkit-line-clamp:2;">
+                <p style="font-size:11px; color:#ccc; max-width:85%; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; 
+                   overflow:hidden; line-height:1.4; margin:0; text-shadow: 1px 1px 3px #000;">
                    ${m.overview}
                 </p>
             </div>
