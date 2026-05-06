@@ -2,7 +2,7 @@ const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 
-// Gestão de Voltar (Android/Gesto)
+// Sistema de Voltar (Android/Gesto)
 window.addEventListener('popstate', (e) => {
     if (document.querySelector('.page.active').id !== 'home') {
         ir('home');
@@ -17,14 +17,13 @@ async function api(url) {
 }
 
 function ir(p) {
-    history.pushState({page: p}, '');
+    if(p !== 'home') history.pushState({page: p}, '');
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
     document.getElementById(p).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.dataset.page === p));
     window.scrollTo(0,0);
 }
 
-// Slider Suave 9:16
+// Slider Automático Suave
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     const movies = d.results.slice(0, 8);
@@ -36,8 +35,10 @@ async function initHero() {
             <div class="hero-overlay">
                 <div class="hero-brand">CINE MEGA</div>
                 <h2>${m.title}</h2>
-                <div class="hero-meta"><span>${m.release_date.split('-')[0]}</span> • <span>⭐ ${m.vote_average.toFixed(1)}</span></div>
-                <p>${m.overview}</p>
+                <div class="hero-meta" style="margin:8px 0; font-size:12px; color:#ffcc00; font-weight:bold;">
+                    <span>${m.release_date.split('-')[0]}</span> • <span>⭐ ${m.vote_average.toFixed(1)}</span>
+                </div>
+                <p style="font-size:11px; color:#bbb; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${m.overview}</p>
             </div>
         </div>
     `).join('');
@@ -50,6 +51,7 @@ async function initHero() {
     });
 }
 
+// Carregar Abas de Gênero
 async function carregarHome() {
     const pop = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('top10').innerHTML = pop.results.slice(0, 10).map((f, i) => `
@@ -59,18 +61,14 @@ async function carregarHome() {
         </div>
     `).join('');
 
-    // ABAS DE GÊNERO (RESGATADAS)
-    const cla = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&release_date.lte=1995-01-01&sort_by=vote_count.desc`);
-    document.getElementById('classicos').innerHTML = cla.results.slice(0, 15).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
+    const breve = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&primary_release_date.gte=2026-06-01&sort_by=popularity.desc`);
+    document.getElementById('embreve').innerHTML = breve.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 
     const trash = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=27,35&primary_release_date.gte=1980-01-01&primary_release_date.lte=1995-12-31`);
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
-    
-    const comed = await api(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=pt-BR&with_genres=35&sort_by=popularity.desc`);
-    document.getElementById('comedia').innerHTML = comed.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// BUSCA "AO VIVO"
+// BUSCA DETALHADA
 async function buscar() {
     const q = document.getElementById("inputBusca").value;
     if(!q) return;
@@ -86,6 +84,7 @@ async function buscar() {
     `).join('');
 }
 
+// ABRIR COM TRAILER E RECOMENDAÇÕES
 async function abrir(id) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,recommendations`);
@@ -94,16 +93,19 @@ async function abrir(id) {
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
     document.getElementById('m-titulo').innerText = m.title;
     document.getElementById('m-sinopse').innerText = m.overview;
-    document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
-    
+
     const tr = m.videos.results.find(v => v.type === "Trailer");
-    document.getElementById('m-trailer').innerHTML = tr ? `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${tr.key}" frameborder="0" allowfullscreen></iframe>` : '';
+    document.getElementById('m-trailer').innerHTML = tr ? `<iframe width="100%" height="210" src="https://www.youtube.com/embed/${tr.key}" frameborder="0" allowfullscreen></iframe>` : '';
+
+    document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// PLAYERS (VLC E MX SNIPER)
+// PLAYERS (VLC DIRETO)
 function abrirVLC() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
+    // Método Instantâneo
     window.location.href = `vlc://${u.replace(/^https?:\/\//, '')}`;
+    // Fallback Sniper
     setTimeout(() => { window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;scheme=http;package=org.videolan.vlc;end`; }, 500);
 }
 
