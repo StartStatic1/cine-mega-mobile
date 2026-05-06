@@ -4,15 +4,13 @@ const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 let heroIndex = 0;
 
-// ====== 1. INICIALIZAÇÃO E AUTO-HERO (FADE SUAVE) ======
+// ====== 1. INICIALIZAÇÃO E AUTO-HERO (FADE + INFO NO RODAPÉ) ======
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
     document.getElementById('home').classList.add('active');
-    
     initHero(); 
     carregarHome();
 
-    // Troca de imagem suave (Fade) a cada 5s
     setInterval(() => {
         const itens = document.querySelectorAll('.hero-item');
         if (itens.length > 0) {
@@ -42,7 +40,7 @@ async function buscar() {
     `).join('');
 }
 
-// ====== 3. CARREGAR HOME (ABAS ORIGINAIS) ======
+// ====== 3. CARREGAR HOME ======
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return {results:[]}; } }
 
 async function carregarHome() {
@@ -63,44 +61,35 @@ async function carregarHome() {
     document.getElementById('trash').innerHTML = trash.results.map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})">`).join('');
 }
 
-// ====== 4. DETALHES (LOGICA ANTI-FILME ERRADO "MA") ======
+// ====== 4. DETALHES (SNIPER) ======
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
-    
-    // SNIPER: Limpeza agressiva para bater com Archive.org e evitar o chute "MA"
-    // Removemos qualquer caractere especial e garantimos que o nome vá "limpo" para a busca estrita
     filmeAtual = m.title.replace(/&/g, "e").replace(/[:]/g, "").replace(/[()]/g, "").trim();
 
     document.getElementById('m-backdrop').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
     document.getElementById('m-poster').src = `https://image.tmdb.org/t/p/w400${m.poster_path}`;
     document.getElementById('m-titulo').innerText = m.title;
-    document.getElementById('m-sinopse').innerText = m.overview || "Localizando título dublado no acervo...";
+    document.getElementById('m-sinopse').innerText = m.overview || "Sincronizando com o acervo...";
 
     const btnPlay = document.getElementById('btn-play-main');
     const boxPlayers = document.getElementById('box-players-externos');
     const aviso = document.getElementById('aviso-embreve');
 
     if(isEmBreve) {
-        // ABA EM BREVE (INTOCADA E PERFEITA)
         btnPlay.style.background = "#222"; btnPlay.style.color = "#555";
         btnPlay.innerText = "ASSISTIR EM BREVE"; btnPlay.onclick = null;
         boxPlayers.style.display = "none";
-        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 ESTE FILME CHEGARÁ EM BREVE AO CINE MEGA."; }
+        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 EM BREVE NO CINE MEGA."; }
     } else {
-        // LIBERADO COM TRAVA DE INTEGRIDADE
         btnPlay.style.background = "var(--red)"; btnPlay.style.color = "#fff";
         btnPlay.innerText = "ASSISTIR AGORA";
-        
-        btnPlay.onclick = () => {
-            // Se o motor no Render retornar algo errado, enviamos o título com comando de busca estrita
-            window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}&f=true`);
-        };
+        btnPlay.onclick = () => window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`);
         
         boxPlayers.style.display = "flex";
         if(aviso) aviso.style.display = "none";
         
-        const motorUrl = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}&f=true`;
+        const motorUrl = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
         boxPlayers.innerHTML = `
             <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">VLC</a>
             <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">MX</a>
@@ -126,11 +115,33 @@ window.addEventListener('popstate', (e) => {
     ir(p, false);
 });
 
+// ====== 6. HERO REVISADO (INFO NO RODAPÉ + DEGRADÊ) ======
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
-    document.getElementById('hero-wrapper').innerHTML = d.results.slice(0, 5).map((m, i) => `
-        <div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.backdrop_path}); opacity: ${i === 0 ? '1' : '0'}; transition: opacity 1.5s ease-in-out; position: absolute; top:0; left:0; width:100%; height:100%; z-index: ${i === 0 ? '1' : '0'};" onclick="abrir(${m.id})">
-            <div class="hero-overlay"><h2>${m.title}</h2></div>
+    document.getElementById('hero-wrapper').innerHTML = d.results.slice(0, 6).map((m, i) => `
+        <div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.backdrop_path}); 
+             opacity: ${i === 0 ? '1' : '0'}; 
+             transition: opacity 1.5s ease-in-out; 
+             position: absolute; top:0; left:0; width:100%; height:100%; 
+             background-size: cover; background-position: center;
+             z-index: ${i === 0 ? '1' : '0'};" onclick="abrir(${m.id})">
+            
+            <div class="hero-overlay" style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; 
+                 text-align:center; padding: 0 20px 25px; 
+                 background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0) 60%); 
+                 height: 100%;">
+                
+                <h2 style="margin:0 0 5px; font-size:22px; color:#fff; font-weight: bold; text-shadow: 2px 2px 5px #000;">${m.title}</h2>
+                
+                <div style="font-size:11px; color:#ffcc00; font-weight:bold; margin-bottom:6px; text-shadow: 1px 1px 3px #000;">
+                    <i class="fa fa-star"></i> ${m.vote_average.toFixed(1)} | ${m.release_date.split('-')[0]}
+                </div>
+
+                <p style="font-size:11px; color:#ccc; max-width:85%; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; 
+                   overflow:hidden; line-height:1.4; margin:0; text-shadow: 1px 1px 3px #000;">
+                   ${m.overview}
+                </p>
+            </div>
         </div>
     `).join('');
 }
