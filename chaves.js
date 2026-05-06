@@ -1,7 +1,7 @@
 // ===== CONFIG =====
-const API_URL = "/api/validar";
+const API_URL = "https://cine-mega-mobile.onrender.com/validar";
 
-// ===== FINGERPRINT =====
+// ===== DEVICE ID =====
 function getDeviceId() {
     let id = localStorage.getItem("cm_device");
 
@@ -10,8 +10,9 @@ function getDeviceId() {
             navigator.userAgent +
             screen.width +
             screen.height +
-            new Date().getTimezoneOffset()
+            new Date().timezoneOffset
         );
+
         localStorage.setItem("cm_device", id);
     }
 
@@ -20,31 +21,24 @@ function getDeviceId() {
 
 // ===== SALVAR =====
 function salvarDados(expira) {
-    const data = JSON.stringify({
+    const data = {
         expira,
         device: getDeviceId()
-    });
+    };
 
-    localStorage.setItem("cm_main", data);
-    sessionStorage.setItem("cm_backup", data);
-    window.name = data;
+    localStorage.setItem("cm_main", JSON.stringify(data));
 }
 
 // ===== LER =====
 function lerDados() {
     try {
-        return JSON.parse(
-            localStorage.getItem("cm_main") ||
-            sessionStorage.getItem("cm_backup") ||
-            window.name ||
-            "{}"
-        );
+        return JSON.parse(localStorage.getItem("cm_main")) || {};
     } catch {
         return {};
     }
 }
 
-// ===== LOGIN (API ONLINE) =====
+// ===== LOGIN =====
 async function _cm_login() {
     const input = document.getElementById("inputChave");
     const erro = document.getElementById("msgErro");
@@ -55,36 +49,38 @@ async function _cm_login() {
     erro.style.display = "none";
 
     try {
-        const r = await fetch(`${API_URL}?chave=${chave}&device=${device}`);
-        const d = await r.json();
+        const res = await fetch(`${API_URL}?chave=${chave}&device=${device}`);
+        const data = await res.json();
 
-        if (d.status === "ok") {
-            salvarDados(d.expira);
+        if (data.status === "ok") {
+            salvarDados(data.expira);
             fecharLogin();
-        } 
-        else if (d.status === "bloqueada") {
-            erro.innerText = "🚫 Chave já usada em outro aparelho";
+        }
+
+        else if (data.status === "bloqueada") {
+            erro.innerText = "🚫 Usada em outro aparelho";
             erro.style.display = "block";
         }
-        else if (d.status === "expirada") {
+
+        else if (data.status === "expirada") {
             erro.innerText = "⏳ Chave expirada";
             erro.style.display = "block";
         }
+
         else {
-            erro.innerText = "❌ Chave inválida!";
+            erro.innerText = "❌ Chave inválida";
             erro.style.display = "block";
         }
 
     } catch (e) {
-        erro.innerText = "⚠️ Erro de conexão com servidor";
+        erro.innerText = "⚠️ Servidor iniciando... tente novamente";
         erro.style.display = "block";
     }
 }
 
-// ===== TESTE (2H) =====
+// ===== TESTE 2H =====
 function _cm_test() {
-    const agora = Date.now();
-    const expira = agora + (2 * 60 * 60 * 1000); // 2 horas
+    const expira = Date.now() + (2 * 60 * 60 * 1000);
     salvarDados(expira);
     fecharLogin();
 }
@@ -94,25 +90,31 @@ function verificarAcesso() {
     const dados = lerDados();
     const agora = Date.now();
 
-    // nunca logou
     if (!dados.expira) {
         abrirLogin();
         return;
     }
 
-    // aparelho diferente
     if (dados.device !== getDeviceId()) {
         bloquear();
         return;
     }
 
-    // expirado
     if (agora > dados.expira) {
         abrirLogin();
         return;
     }
 
     fecharLogin();
+}
+
+// ===== UI =====
+function abrirLogin() {
+    document.getElementById("login").style.display = "flex";
+}
+
+function fecharLogin() {
+    document.getElementById("login").style.display = "none";
 }
 
 // ===== BLOQUEIO =====
@@ -126,15 +128,6 @@ function bloquear() {
         Dispositivo inválido
         </h2>
     `;
-}
-
-// ===== UI =====
-function abrirLogin() {
-    document.getElementById("login").style.display = "flex";
-}
-
-function fecharLogin() {
-    document.getElementById("login").style.display = "none";
 }
 
 // ===== INIT =====
