@@ -1,5 +1,5 @@
 :root { --red: #e50914; --bg: #000; }
-/* TRAVAS DE APP NATIVO */
+/* TRAVAS ANTI-CÓPIA PARA O APK */
 * { 
     box-sizing: border-box; 
     -webkit-tap-highlight-color: transparent; 
@@ -8,21 +8,22 @@
     -webkit-user-drag: none; /* Bloqueia arrastar imagens */
 }
 
-body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans-serif; overflow-x:hidden; padding-bottom: 80px; }
+body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', Roboto, sans-serif; overflow-x:hidden; padding-bottom: 80px; }
 
-/* HEADER HOME (DISCRETO) */
+/* HEADER HOME */
 .header-app { position:fixed; top:0; width:100%; max-width:500px; height:50px; background:rgba(0,0,0,0.3); z-index:1000; display:flex; align-items:center; padding:0 20px; pointer-events:none; }
 .logo-top { color:var(--red); font-weight:900; font-size:16px; pointer-events:auto; }
 
-/* HERO 9:16 TRAVADO */
+/* HERO 9:16 */
 .hero-container { position:relative; width:100%; height:82vh; background:#000; }
 #hero-wrapper { display:flex; width:100%; height:100%; overflow-x:auto; scroll-snap-type: x mandatory; scrollbar-width:none; }
+#hero-wrapper::-webkit-scrollbar { display:none; }
 .hero-item { flex:0 0 100%; height:100%; background-size:cover; background-position:center; scroll-snap-align: start; position:relative; }
 .hero-overlay { position:absolute; inset:0; background:linear-gradient(0deg, #000 8%, transparent 60%); display:flex; flex-direction:column; justify-content:flex-end; padding:30px 20px; }
 .hero-overlay h2 { font-size:22px; margin:0; font-weight:800; }
 .hero-overlay p { font-size:10px; color:#aaa; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:6px 0; line-height:1.2; max-width:85%; }
 
-/* DETALHES - 100% LIMPO (SEM BARRA) */
+/* DETALHES 100% LIMPO (SEM BARRA) */
 .detalhes-header { height:42vh; background-size:cover; background-position:top; position:relative; border:none; }
 .btn-back-clean { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:1100; }
 
@@ -32,7 +33,7 @@ body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans
 .row { display:flex; overflow-x:auto; gap:10px; padding:5px 0 15px 15px; scrollbar-width:none; }
 .card-top { position:relative; min-width:145px; height:200px; flex-shrink:0; margin-left:20px; }
 .card-top img { width:100%; height:100%; object-fit:cover; border-radius:6px; border:1px solid #1a1a1a; }
-.numero-fix { position:absolute; left:-22px; bottom:-12px; font-size:85px; font-weight:900; color:#000; -webkit-text-stroke: 1.5px #fff; z-index:10; line-height:0.8; }
+.numero-fix { position:absolute; left:-22px; bottom:-12px; font-size:85px; font-weight:900; color:#000; -webkit-text-stroke: 1.5px #fff; z-index:10; line-height:0.8; pointer-events:none; }
 .card-min { min-width:115px; height:165px; flex-shrink:0; border-radius:6px; object-fit:cover; border:1px solid #1a1a1a; }
 
 /* BUSCA LISTA MINI */
