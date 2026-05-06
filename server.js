@@ -1,51 +1,54 @@
 const express = require("express");
 const app = express();
 
-let CHAVES = {};
+let CHAVES = global.CHAVES || {};
+global.CHAVES = CHAVES;
 
-function gerarChave() {
-  return "VIP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-// criar chave
+// GERAR CHAVE (teste)
 app.get("/criar", (req, res) => {
-  const dias = parseInt(req.query.dias) || 1;
+    const chave = "VIP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-  const chave = gerarChave();
+    CHAVES[chave] = {
+        expira: Date.now() + (2 * 60 * 60 * 1000),
+        device: null
+    };
 
-  CHAVES[chave] = {
-    expira: Date.now() + dias * 86400000,
-    device: null
-  };
-
-  res.json({ chave });
+    res.json({ chave });
 });
 
-// validar
+// VALIDAR (SEU CÓDIGO AQUI CORRIGIDO)
 app.get("/validar", (req, res) => {
-  const { chave, device } = req.query;
+    const { chave, device } = req.query;
 
-  const dados = CHAVES[chave];
+    if (!chave) return res.json({ status: "erro" });
 
-  if (!dados) return res.json({ status: "erro" });
+    const dados = CHAVES[chave];
 
-  if (Date.now() > dados.expira)
-    return res.json({ status: "expirada" });
+    if (!dados) return res.json({ status: "erro" });
 
-  if (!dados.device) {
-    dados.device = device;
-    return res.json({ status: "ok", expira: dados.expira });
-  }
+    if (Date.now() > dados.expira)
+        return res.json({ status: "expirada" });
 
-  if (dados.device !== device)
-    return res.json({ status: "bloqueada" });
+    if (!dados.device) {
+        dados.device = device;
 
-  res.json({ status: "ok", expira: dados.expira });
+        return res.json({
+            status: "ok",
+            expira: dados.expira
+        });
+    }
+
+    if (dados.device !== device)
+        return res.json({ status: "bloqueada" });
+
+    return res.json({
+        status: "ok",
+        expira: dados.expira
+    });
 });
 
-// listar (admin)
-app.get("/listar", (req, res) => {
-  res.json(CHAVES);
-});
+const PORT = process.env.PORT || 3000;
 
-app.listen(3000, () => console.log("rodando"));
+app.listen(PORT, () => {
+    console.log("rodando na porta", PORT);
+});
