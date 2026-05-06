@@ -1,8 +1,8 @@
 :root { --red: #e50914; --bg: #000; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', Roboto, sans-serif; overflow-x:hidden; padding-bottom: 80px; }
+body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', sans-serif; overflow-x:hidden; padding-bottom: 80px; }
 
-/* HEADER HOME DISCRETO */
+/* HEADER HOME (DISCRETO) */
 .header-app { position:fixed; top:0; width:100%; max-width:500px; height:50px; background:rgba(0,0,0,0.3); z-index:1000; display:flex; align-items:center; padding:0 20px; pointer-events:none; }
 .logo-top { color:var(--red); font-weight:900; font-size:16px; pointer-events:auto; }
 
@@ -14,6 +14,10 @@ body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', Robo
 .hero-overlay h2 { font-size:22px; margin:0; font-weight:800; }
 .hero-overlay p { font-size:10px; color:#aaa; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:6px 0; line-height:1.2; max-width:85%; }
 
+/* DETALHES - ZERO BARRA (100% LIMPO) */
+.detalhes-header { height:42vh; background-size:cover; background-position:top; position:relative; }
+.btn-back-clean { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:1100; }
+
 /* TOP 10 E CARROSSEL */
 .secao { padding: 20px 0 0 15px; }
 .secao h2 { font-size: 13.5px; margin-bottom: 10px; font-weight: 700; color: #efefef; text-transform: uppercase; }
@@ -23,13 +27,9 @@ body { margin:0; background:var(--bg); color:#fff; font-family: 'Segoe UI', Robo
 .numero-fix { position:absolute; left:-22px; bottom:-12px; font-size:85px; font-weight:900; color:#000; -webkit-text-stroke: 1.5px #fff; z-index:10; line-height:0.8; }
 .card-min { min-width:115px; height:165px; flex-shrink:0; border-radius:6px; object-fit:cover; border:1px solid #1a1a1a; }
 
-/* DETALHES CLEAN */
-.detalhes-header { height:40vh; background-size:cover; background-position:top; position:relative; }
-.btn-back-clean { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:1100; }
-
-/* BUSCA LISTA */
-.search-row { display:flex; gap:12px; padding:15px; border-bottom:1px solid #111; align-items:center; }
-.search-row img { width:70px; height:100px; border-radius:6px; object-fit:cover; }
+/* BUSCA LISTA MINI */
+.search-row { display:flex; gap:12px; padding:12px; border-bottom:1px solid #111; align-items:center; }
+.search-row img { width:65px; height:95px; border-radius:6px; object-fit:cover; }
 .search-info h4 { margin:0; font-size:13.5px; }
 .search-info p { font-size:10px; color:#777; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 
