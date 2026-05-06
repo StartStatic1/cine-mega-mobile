@@ -2,7 +2,7 @@ const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const MOTOR = "https://api-scraper-cinema.onrender.com";
 let filmeAtual = "";
 
-// Backstack para não sair do app
+// Trava de "Voltar" (Android/Gesto)
 window.addEventListener('popstate', () => { if(document.querySelector('.page.active').id !== 'home') ir('home', false); });
 
 async function api(url) { try { const r = await fetch(url); return await r.json(); } catch(e) { return null; } }
@@ -21,8 +21,8 @@ async function initHero() {
         <div class="hero-item" style="background-image: url(https://image.tmdb.org/t/p/original${m.poster_path})" onclick="abrir(${m.id})">
             <div class="hero-overlay">
                 <h2>${m.title}</h2>
-                <div style="font-size:10px; color:#ffcc00; margin:4px 0; font-weight:bold;">⭐ ${m.vote_average.toFixed(1)}</div>
-                <p>${m.overview}</p>
+                <div style="font-size:10px; color:#ffcc00; margin:5px 0; font-weight:bold;">⭐ ${m.vote_average.toFixed(1)}</div>
+                <p style="font-size:10px; color:#aaa; line-height:1.2;">${m.overview}</p>
             </div>
         </div>
     `).join('');
@@ -35,8 +35,8 @@ async function initHero() {
 }
 
 async function carregarHome() {
-    const pop = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
-    document.getElementById('top10').innerHTML = pop.results.slice(0, 10).map((f, i) => `
+    const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
+    document.getElementById('top10').innerHTML = d.results.slice(0, 10).map((f, i) => `
         <div class="card-top" onclick="abrir(${f.id})">
             <span class="numero-fix">${i + 1}</span>
             <img src="https://image.tmdb.org/t/p/w400${f.poster_path}">
@@ -89,7 +89,8 @@ async function abrir(id, isBreve = false) {
 
 function abrirVLC() {
     const u = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-    window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;scheme=http;package=org.videolan.vlc;end`;
+    // 🔥 VLC SNIPER MODE: INTENT DIRETA IGUAL AO MX
+    window.location.href = `intent://${u.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;end`;
 }
 
 function abrirMX() {
