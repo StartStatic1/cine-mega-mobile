@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Cine Mega Mobile</title>
+    <title>Cine Mega VOD</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -14,49 +14,35 @@
             <div class="hero-dots" id="hero-dots"></div>
             <div id="hero-wrapper"></div>
         </div>
-
-        <div class="secao">
-            <h2>🔥 TOP 10 SEMANA</h2>
-            <div id="top10" class="row"></div>
-        </div>
-
-        <div class="secao">
-            <h2>📅 VAI ESTREAR (JUNHO+)</h2>
-            <div id="estreias" class="row"></div>
-        </div>
-
-        <div class="secao">
-            <h2>💀 BAÚ DO TRASH</h2>
-            <div id="trash" class="row"></div>
-        </div>
-    </div>
-
-    <div id="buscaPage" class="page">
-        <div style="padding:40px 15px 10px; background:#000; position:sticky; top:0; z-index:1000;">
-            <input id="inputBusca" style="width:100%; padding:15px; border-radius:15px; background:#1a1a1a; border:none; color:#fff;" placeholder="Buscar..." onkeyup="buscar()">
-        </div>
-        <div id="resultados"></div>
+        <div class="secao"><h2>🔥 TOP 10 SEMANA</h2><div id="top10" class="row"></div></div>
+        <div class="secao"><h2>💀 BAÚ DO TRASH</h2><div id="trash" class="row"></div></div>
+        <div class="secao"><h2>🎞️ CLÁSSICOS</h2><div id="classicos" class="row"></div></div>
     </div>
 
     <div id="detalhes" class="page">
-        <div id="m-backdrop" style="height:35vh; background-size:cover; position:relative;">
-            <button onclick="ir('home')" style="position:absolute; top:40px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:45px; height:45px; border-radius:50%;"><i class="fa fa-chevron-left"></i></button>
+        <div id="m-backdrop" class="detalhes-header">
+            <button onclick="ir('home')" style="position:absolute; top:50px; left:20px; background:rgba(0,0,0,0.5); border:none; color:#fff; width:45px; height:45px; border-radius:50%;"><i class="fa fa-chevron-left"></i></button>
         </div>
-        <div style="padding:20px;">
-            <h1 id="m-titulo"></h1>
-            <button onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))" style="width:100%; background:var(--red); color:#fff; padding:18px; border:none; border-radius:12px; font-weight:bold; margin-bottom:20px;">ASSISTIR AGORA</button>
-            <div style="display:flex; justify-content:center; gap:25px;">
-                <button onclick="abrirVLC()" style="width:60px; height:60px; border-radius:50%; background:#ff8800; border:none; color:#fff; font-weight:bold;">VLC</button>
-                <button onclick="abrirMX()" style="width:60px; height:60px; border-radius:50%; background:#0052d4; border:none; color:#fff; font-weight:bold;">MX</button>
+        <div class="detalhes-body">
+            <div style="display:flex; gap:15px; align-items:flex-end;">
+                <img id="m-poster" style="width:120px; border-radius:10px; border:3px solid #000; box-shadow:0 0 20px #000;">
+                <div><h1 id="m-titulo" style="font-size:24px; margin:0;"></h1><p id="m-meta" style="color:var(--red); font-size:12px; font-weight:bold;"></p></div>
             </div>
-            <p id="m-sinopse" style="margin-top:25px; color:#aaa; line-height:1.6;"></p>
+            <button onclick="play()" style="width:100%; background:var(--red); color:#fff; padding:18px; border:none; border-radius:12px; font-weight:bold; margin-top:20px; font-size:16px;">ASSISTIR AGORA</button>
+            <div class="player-row">
+                <div onclick="abrirVLC()" class="circle-btn" style="background:#ff8800">VLC</div>
+                <div onclick="abrirMX()" class="circle-btn" style="background:#0052d4">MX</div>
+            </div>
+            <h3>Sinopse</h3><p id="m-sinopse" style="color:#bbb; font-size:14px; line-height:1.6;"></p>
+            <h3>Trailer</h3><div id="m-trailer"></div>
+            <h3>Elenco</h3><div id="m-elenco" class="row" style="gap:15px;"></div>
+            <h3>Sugestões</h3><div id="m-rec" class="row"></div>
         </div>
     </div>
 
-    <nav class="nav">
-        <div class="nav-item active" onclick="ir('home')"><i class="fa fa-home"></i><span>Home</span></div>
-        <div class="nav-item" onclick="ir('buscaPage')"><i class="fa fa-search"></i><span>Busca</span></div>
-        <div class="nav-item" onclick="alert('Explorar')"><i class="fa fa-compass"></i><span>Explorar</span></div>
+    <nav style="position:fixed; bottom:0; width:100%; height:75px; background:#0a0a0a; border-top:1px solid #111; display:flex; justify-content:space-around; align-items:center; z-index:2000;">
+        <div onclick="ir('home')"><i class="fa fa-home" style="font-size:24px; color:var(--red);"></i></div>
+        <div onclick="alert('Busca')"><i class="fa fa-search" style="font-size:24px; color:#555;"></i></div>
     </nav>
 
     <script src="app.js"></script>
