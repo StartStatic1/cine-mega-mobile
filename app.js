@@ -1,7 +1,7 @@
 // === CONFIGURAÇÕES TÉCNICAS E PROTEÇÃO ======
 // As chaves estão codificadas em Base64 para ofuscação básica (Anti-MT Manager para leigos)
 // [0] = MOTOR_APP, [1] = API_KEY
-const _0x1a2b = ["aHR0cHM6Ly9hcGktc2NyYXBlci1jaW5lbWEub25yZW5kZXIuY29t", "YWRhODg1NjY2NjViNjBiNDQ0NWIyYjgwMDA1NmFhMzM="];
+const _0x1a2b = ["aHR0cHM6Ly9hcGktc2NyYXBlci1jaW5lbWEub25yZW5kZXIuY29t", "YWRhODg1NjY2NjViNjBiNDRiNWMyYjgwMDA1NmFhMzM="];
 
 const MOTOR_APP = atob(_0x1a2b[0]);
 const API_KEY = atob(_0x1a2b[1]);
