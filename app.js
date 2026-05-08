@@ -1,16 +1,70 @@
-// === CONFIGURAÇÕES TÉCNICAS ======
-const API_KEY = "ada88566665b60b44b5c2b800056aa33";
-const MOTOR_APP = "https://api-scraper-cinema.onrender.com";
+// === CONFIGURAÇÕES TÉCNICAS E PROTEÇÃO ======
+// As chaves estão codificadas em Base64 para ofuscação básica (Anti-MT Manager para leigos)
+// [0] = MOTOR_APP, [1] = API_KEY
+const _0x1a2b = ["aHR0cHM6Ly9hcGktc2NyYXBlci1jaW5lbWEub25yZW5kZXIuY29t", "YWRhODg1NjY2NjViNjBiNDQ0NWIyYjgwMDA1NmFhMzM="];
+
+const MOTOR_APP = atob(_0x1a2b[0]);
+const API_KEY = atob(_0x1a2b[1]);
 const isAndroidApp = /android/i.test(navigator.userAgent || navigator.vendor || window.opera);
 
 let filmeAtual = "";
-let filmeIdAtual = ""; // Necessário para o Player Interno
+let filmeIdAtual = ""; 
 let heroIndex = 0;
-let timerBuscaApp; // Para o Debounce
+let timerBuscaApp; 
 
-// ====== 1. INICIALIZAÇÃO E AUTO-HERO (FADE + INFO NO RODAPÉ) ======
+// ====== 0. SISTEMA DE ATIVAÇÃO VIP ======
+function verificarAcesso() {
+    const chaveSalva = localStorage.getItem('cine_mega_key');
+    const statusAtivacao = localStorage.getItem('cine_mega_status');
+
+    if (!chaveSalva || statusAtivacao !== 'ativo') {
+        document.getElementById('tela-ativacao').style.display = 'flex';
+        // Gera um ID visual pro usuário mandar pra você
+        document.getElementById('device-id').innerText = btoa(navigator.userAgent).substring(0, 8).toUpperCase();
+        return false;
+    } else {
+        document.getElementById('tela-ativacao').style.display = 'none';
+        return true;
+    }
+}
+
+async function tentarAtivar() {
+    const chaveDigitada = document.getElementById('input-chave').value.trim();
+
+    if (chaveDigitada.length < 5) {
+        alert("Chave inválida!");
+        return;
+    }
+
+    const btn = document.getElementById('btn-ativar');
+    btn.innerText = "VERIFICANDO...";
+    btn.disabled = true;
+
+    try {
+        // CHAVE MESTRA PROVISÓRIA (Até configurarmos o Render)
+        // Você pode dar essa chave pro usuário testar agora.
+        if (chaveDigitada === "MESTRE-2026") {
+            localStorage.setItem('cine_mega_key', chaveDigitada);
+            localStorage.setItem('cine_mega_status', 'ativo');
+            alert("SISTEMA LIBERADO! BEM-VINDO.");
+            window.location.reload(); // Recarrega o app liberado
+        } else {
+            alert("Chave inválida ou expirada!");
+            btn.innerText = "Ativar Sistema";
+            btn.disabled = false;
+        }
+    } catch (e) {
+        alert("Erro de conexão! Verifique a internet.");
+        btn.innerText = "Ativar Sistema";
+        btn.disabled = false;
+    }
+}
+
+// ====== 1. INICIALIZAÇÃO ======
 document.addEventListener("DOMContentLoaded", () => {
-    // Garante que os estilos do SPA (Single Page Application) comecem corretos
+    // Se não tem acesso, para por aqui e não carrega filmes no fundo (economiza sua API)
+    if (!verificarAcesso()) return; 
+
     document.getElementById('home').style.display = 'block';
     
     initHero(); 
@@ -31,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ====== 2. BUSCA EM LISTA COM DEBOUNCE ======
 function aoDigitarBuscaApp() {
     clearTimeout(timerBuscaApp);
-    timerBuscaApp = setTimeout(buscar, 600); // Aguarda 600ms antes de chamar a API
+    timerBuscaApp = setTimeout(buscar, 600); 
 }
 
 async function buscar() {
@@ -82,9 +136,8 @@ async function carregarHome() {
 // ====== 4. DETALHES (SNIPER) ======
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
-    filmeIdAtual = id; // Guarda o ID globalmente para o player
+    filmeIdAtual = id; 
     
-    // RESET: Esconde player e botões extras antes de carregar o novo filme
     document.getElementById('iframe-player').src = '';
     document.getElementById('secao-player-interno').style.display = 'none';
     document.getElementById('btn-play-externo').style.display = 'none';
@@ -119,22 +172,15 @@ async function abrir(id, isEmBreve = false) {
 
 // ====== 5. NOVO SISTEMA DO PLAYER ======
 function carregarPlayerInternoApp() {
-    // Troca o botão principal pelo Iframe
     document.getElementById('btn-play-interno').style.display = 'none';
     document.getElementById('secao-player-interno').style.display = 'block';
-    
-    // Injeta a URL do MyEmbed
     document.getElementById('iframe-player').src = `https://myembed.biz/filme/${filmeIdAtual}`;
-    
-    // Revela os botões do Render e Nativos
     document.getElementById('btn-play-externo').style.display = 'block';
     
-    // Mostra VLC/MX apenas se estiver no Android
     if(isAndroidApp) {
         document.getElementById('box-players-externos').style.display = 'flex';
     }
 
-    // Configura os links com os dados recém-carregados
     let linkRender = `${MOTOR_APP}/buscar?id=${filmeIdAtual}&titulo=${encodeURIComponent(filmeAtual)}`;
     document.getElementById('btn-play-externo').href = linkRender;
     
@@ -146,7 +192,6 @@ function carregarPlayerInternoApp() {
 }
 
 function fecharDetalhesApp() {
-    // Ao clicar na setinha de voltar, essa função limpa o iframe e volta pra home
     document.getElementById('iframe-player').src = '';
     document.getElementById('secao-player-interno').style.display = 'none';
     document.getElementById('btn-play-interno').style.display = 'flex';
@@ -159,12 +204,10 @@ function fecharDetalhesApp() {
 function ir(p, push = true) {
     if(push) history.pushState({page: p}, '');
     
-    // Oculta todas as páginas (display none) e mostra só a correta
     document.querySelectorAll('.page').forEach(e => e.style.display = 'none');
     document.getElementById(p).style.display = 'block';
     window.scrollTo(0,0);
 
-    // Gerencia a cor dos ícones na barra de baixo
     if(document.getElementById('icon-home')) {
         document.getElementById('icon-home').style.color = p === 'home' ? '#e50914' : '#555';
     }
@@ -175,14 +218,13 @@ function ir(p, push = true) {
 
 window.addEventListener('popstate', (e) => {
     const p = (e.state && e.state.page) ? e.state.page : 'home';
-    // Se estiver voltando da tela de detalhes pelo botão nativo do celular, limpa o vídeo
     if (document.getElementById('detalhes').style.display === 'block' && p !== 'detalhes') {
         document.getElementById('iframe-player').src = '';
     }
     ir(p, false);
 });
 
-// ====== 7. HERO REVISADO (INFO NO RODAPÉ + DEGRADÊ) ======
+// ====== 7. HERO REVISADO ======
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('hero-wrapper').innerHTML = d.results.slice(0, 6).map((m, i) => `
