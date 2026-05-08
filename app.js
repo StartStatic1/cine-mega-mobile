@@ -1,10 +1,8 @@
 // === CONFIGURAÇÕES TÉCNICAS E PROTEÇÃO ======
-// As chaves estão codificadas em Base64 para ofuscação básica (Anti-MT Manager para leigos)
-// [0] = MOTOR_APP, [1] = API_KEY
-const _0x1a2b = ["aHR0cHM6Ly9hcGktc2NyYXBlci1jaW5lbWEub25yZW5kZXIuY29t", "YWRhODg1NjY2NjViNjBiNDRiNWMyYjgwMDA1NmFhMzM="];
-
-const MOTOR_APP = atob(_0x1a2b[0]);
-const API_KEY = atob(_0x1a2b[1]);
+// Escondemos o seu Servidor VIP (Render) em Base64 para ninguém roubar o link.
+// A chave do TMDB fica em texto normal para o Android não bugar o carregamento das capas.
+const MOTOR_APP = atob("aHR0cHM6Ly9hcGktc2NyYXBlci1jaW5lbWEub25yZW5kZXIuY29t");
+const API_KEY = "ada88566665b60b44b5c2b800056aa33";
 const isAndroidApp = /android/i.test(navigator.userAgent || navigator.vendor || window.opera);
 
 let filmeAtual = "";
@@ -41,9 +39,11 @@ async function tentarAtivar() {
     btn.disabled = true;
 
     try {
-        // CHAVE MESTRA PROVISÓRIA (Até configurarmos o Render)
-        // Você pode dar essa chave pro usuário testar agora.
-        if (chaveDigitada === "MESTRE-2026") {
+        // Validação no seu servidor Render
+        const response = await fetch(`${MOTOR_APP}/validar?key=${chaveDigitada}`);
+        const data = await response.json();
+
+        if (data.status === 'sucesso') {
             localStorage.setItem('cine_mega_key', chaveDigitada);
             localStorage.setItem('cine_mega_status', 'ativo');
             alert("SISTEMA LIBERADO! BEM-VINDO.");
@@ -54,9 +54,17 @@ async function tentarAtivar() {
             btn.disabled = false;
         }
     } catch (e) {
-        alert("Erro de conexão! Verifique a internet.");
-        btn.innerText = "Ativar Sistema";
-        btn.disabled = false;
+        // CHAVE MESTRA PROVISÓRIA (Caso o servidor caia ou para testes)
+        if (chaveDigitada === "MESTRE-2026") {
+            localStorage.setItem('cine_mega_key', chaveDigitada);
+            localStorage.setItem('cine_mega_status', 'ativo');
+            alert("SISTEMA LIBERADO (MODO OFFLINE)!");
+            window.location.reload();
+        } else {
+            alert("Erro de conexão! Verifique a internet.");
+            btn.innerText = "Ativar Sistema";
+            btn.disabled = false;
+        }
     }
 }
 
