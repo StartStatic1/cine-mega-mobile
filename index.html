@@ -2,100 +2,120 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cine Mega Mobile</title>
 
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* CSS EXTRA PARA OS PLAYERS NO APP (Não apague seu style.css, isso apenas complementa) */
+        .btn-app-play { width: 100%; color: #fff; background: #e50914; padding: 16px; border: none; border-radius: 10px; font-weight: 900; font-size: 15px; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4); text-transform: uppercase; transition: transform 0.1s; }
+        .btn-app-play:active { transform: scale(0.97); }
+        
+        .btn-app-vip { width: 100%; color: #fff; background: #0052D4; padding: 14px; border: none; border-radius: 10px; font-weight: bold; font-size: 14px; margin-bottom: 20px; text-transform: uppercase; display: none; }
+        
+        .btn-mini-app { flex: 1; padding: 12px; border-radius: 8px; color: #fff; font-weight: bold; font-size: 12px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        
+        .btn-back-clean { position: absolute; top: 20px; left: 15px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; z-index: 3000; backdrop-filter: blur(5px); box-shadow: 0 2px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
+
+        .player-box-app { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 2px solid #e50914; margin: 15px 0; display: none; }
+        .player-box-app iframe { width: 100%; height: 100%; border: none; }
+    </style>
 </head>
 
-<body oncontextmenu="return false">
+<body oncontextmenu="return false" style="background-color: #000; color: #fff; overflow-x: hidden;">
 
-    <!-- APP ABRE DIRETO (SEM LOGIN) -->
     <div id="login" style="display:none !important;"></div>
 
-    <!-- HEADER -->
-    <div class="header-app">
-        <div class="logo-top">CINE MEGA</div>
+    <div class="header-app" style="position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.9); padding: 15px; z-index: 1000; border-bottom: 2px solid #e50914; text-align: center;">
+        <div class="logo-top" style="color: #e50914; font-weight: 900; font-size: 20px; letter-spacing: 2px;">CINE MEGA</div>
     </div>
 
-    <!-- HOME -->
-    <div id="home" class="page">
+    <div id="home" class="page" style="padding-top: 60px; padding-bottom: 85px;">
         <div class="hero-container">
             <div id="hero-wrapper"></div>
         </div>
 
-        <div class="secao"><h2>🔥 TOP 10 SEMANA</h2><div id="top10" class="row"></div></div>
-        <div class="secao"><h2>🚀 LANÇAMENTOS</h2><div id="lancamentos" class="row"></div></div>
-        <div class="secao"><h2>📅 EM BREVE (2026+)</h2><div id="embreve" class="row"></div></div>
-        <div class="secao"><h2>🎞️ CLÁSSICOS</h2><div id="classicos" class="row"></div></div>
-        <div class="secao"><h2>💀 BAÚ DO TRASH</h2><div id="trash" class="row"></div></div>
+        <div class="secao" style="padding-left: 15px;"><h2 style="font-size: 16px; border-left: 3px solid #e50914; padding-left: 10px;">🔥 TOP 10 SEMANA</h2><div id="top10" class="row"></div></div>
+        <div class="secao" style="padding-left: 15px;"><h2 style="font-size: 16px; border-left: 3px solid #e50914; padding-left: 10px;">🚀 LANÇAMENTOS</h2><div id="lancamentos" class="row"></div></div>
+        <div class="secao" style="padding-left: 15px;"><h2 style="font-size: 16px; border-left: 3px solid #e50914; padding-left: 10px;">📅 EM BREVE (2026+)</h2><div id="embreve" class="row"></div></div>
+        <div class="secao" style="padding-left: 15px;"><h2 style="font-size: 16px; border-left: 3px solid #e50914; padding-left: 10px;">🎞️ CLÁSSICOS</h2><div id="classicos" class="row"></div></div>
+        <div class="secao" style="padding-left: 15px;"><h2 style="font-size: 16px; border-left: 3px solid #e50914; padding-left: 10px;">💀 BAÚ DO TRASH</h2><div id="trash" class="row"></div></div>
     </div>
 
-    <!-- BUSCA -->
-    <div id="buscaPage" class="page">
-        <div style="padding:70px 15px 10px;">
+    <div id="buscaPage" class="page" style="display:none; padding-bottom: 85px;">
+        <div style="padding:75px 15px 10px;">
             <input id="inputBusca"
-                style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:none; color:#fff;"
-                placeholder="Pesquisar filme..." oninput="buscar()">
+                style="width:100%; padding:15px; border-radius:10px; background:#1a1a1a; border:1px solid #333; color:#fff; font-size: 15px; outline: none;"
+                placeholder="Pesquisar filme..." oninput="aoDigitarBuscaApp()">
         </div>
         <div id="resultados"></div>
     </div>
 
-    <!-- DETALHES -->
-    <div id="detalhes" class="page detalhes-page">
+    <div id="detalhes" class="page detalhes-page" style="display:none; padding-bottom: 85px; position: relative; z-index: 1500; background: #000; min-height: 100vh;">
 
-        <button class="btn-back-clean" onclick="ir('home')">
+        <button class="btn-back-clean" onclick="fecharDetalhesApp()">
             <i class="fa fa-chevron-left"></i>
         </button>
 
-        <div id="m-backdrop" class="detalhes-header"></div>
+        <div id="m-backdrop" class="detalhes-header" style="height: 35vh; background-size: cover; background-position: center; border-bottom: 2px solid #e50914;"></div>
 
-        <div style="padding:20px;">
+        <div style="padding:20px; margin-top: -30px; position: relative;">
 
             <div id="aviso-embreve"
-                style="background:#ffcc00; color:#000; padding:10px; border-radius:5px; font-weight:bold; font-size:11px; text-align:center; margin-bottom:15px; display:none;">
+                style="background:#ffcc00; color:#000; padding:12px; border-radius:8px; font-weight:900; font-size:12px; text-align:center; margin-bottom:15px; display:none;">
                 🍿 EM BREVE NO CINE MEGA.
             </div>
 
-            <div style="display:flex; gap:15px; align-items:flex-end;">
+            <div style="display:flex; gap:15px; align-items:flex-end; margin-bottom: 20px;">
                 <img id="m-poster"
-                    style="width:110px; border-radius:8px; border:2px solid #000; margin-top:-60px; position:relative; z-index:100;">
-                <h1 id="m-titulo" style="font-size:20px; margin:0;"></h1>
+                    style="width:110px; height:160px; object-fit:cover; border-radius:8px; border:3px solid #000; margin-top:-70px; position:relative; z-index:100; box-shadow: 0 5px 15px rgba(0,0,0,0.8);">
+                <h1 id="m-titulo" style="font-size:22px; margin:0; margin-bottom: 5px; text-shadow: 1px 1px 3px #000;"></h1>
             </div>
 
-            <button id="btn-play-main"
-                onclick="window.open('https://api-scraper-cinema.onrender.com/buscar?titulo='+encodeURIComponent(filmeAtual))"
-                style="width:100%; color:#fff; background:#e50914; padding:18px; border:none; border-radius:10px; font-weight:bold; margin:20px 0;">
-                ASSISTIR AGORA
+            <div id="secao-player-interno" class="player-box-app">
+                <iframe id="iframe-player" src="" allowfullscreen></iframe>
+            </div>
+
+            <button id="btn-play-interno" class="btn-app-play" onclick="carregarPlayerInternoApp()">
+                <i class="fa fa-play"></i> ASSISTIR NO APP
             </button>
+            
+            <a id="btn-play-externo" class="btn-app-vip" href="#" target="_blank" style="text-decoration:none;">
+                <i class="fa fa-server"></i> SERVIDOR VIP (RENDER)
+            </a>
 
-            <div id="box-players-externos"
-                style="display:flex; justify-content:center; gap:25px; margin-bottom:20px;"></div>
+            <div id="box-players-externos" style="display:none; justify-content:center; gap:15px; margin-bottom:20px;">
+                <a id="btn-vlc-app" class="btn-mini-app" style="background:#FF8800" href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/3/38/VLC_icon.png" width="16"> VLC</a>
+                <a id="btn-mx-app" class="btn-mini-app" style="background:#0052D4" href="#"><img src="https://play-lh.googleusercontent.com/wA0_K5Zq40k86e8m-EEMoT0XN6h_l1B3171lV1O6s1XnZ5D_1G1v0qVj0A3XyZJ3Ww=w240-h480-rw" width="16"> MX</a>
+            </div>
 
-            <h3>Sinopse</h3>
-            <p id="m-sinopse" style="color:#aaa; font-size:12px; line-height:1.5;"></p>
+            <h3 style="color:#e50914; font-size:14px; text-transform:uppercase;">Sinopse</h3>
+            <p id="m-sinopse" style="color:#bbb; font-size:13px; line-height:1.6;"></p>
 
-            <h3>Trailer</h3>
-            <div id="m-trailer"></div>
+            <h3 style="color:#e50914; font-size:14px; text-transform:uppercase; margin-top:20px;">Trailer</h3>
+            <div id="m-trailer" style="width:100%; aspect-ratio:16/9; background:#111; border-radius:10px; overflow:hidden;"></div>
 
-            <h3>Elenco</h3>
-            <div id="m-elenco" class="row"></div>
+            <h3 style="color:#e50914; font-size:14px; text-transform:uppercase; margin-top:20px;">Elenco</h3>
+            <div id="m-elenco" class="row" style="display:flex; overflow-x:auto; gap:10px; padding-bottom:10px; scrollbar-width:none;"></div>
 
-            <h3>Você também pode gostar</h3>
-            <div id="m-rec" class="row"></div>
+            <h3 style="color:#e50914; font-size:14px; text-transform:uppercase; margin-top:20px;">Recomendados</h3>
+            <div id="m-rec" class="row" style="display:flex; overflow-x:auto; gap:10px; padding-bottom:10px; scrollbar-width:none;"></div>
 
         </div>
     </div>
 
-    <!-- NAV -->
-    <nav style="position:fixed; bottom:0; width:100%; height:75px; background:#080808; border-top:1px solid #111; display:flex; justify-content:space-around; align-items:center; z-index:2000;">
-        <div onclick="ir('home')"><i class="fa fa-home" style="font-size:22px; color:#e50914;"></i></div>
-        <div onclick="ir('buscaPage')"><i class="fa fa-search" style="font-size:22px; color:#444;"></i></div>
+    <nav style="position:fixed; bottom:0; width:100%; height:65px; background:rgba(10,10,10,0.95); border-top:1px solid #222; display:flex; justify-content:space-around; align-items:center; z-index:2000; backdrop-filter: blur(10px);">
+        <div onclick="ir('home')" style="text-align: center; width: 50%;">
+            <i id="icon-home" class="fa fa-home" style="font-size:24px; color:#e50914; transition: color 0.3s;"></i>
+        </div>
+        <div onclick="ir('buscaPage')" style="text-align: center; width: 50%;">
+            <i id="icon-busca" class="fa fa-search" style="font-size:24px; color:#555; transition: color 0.3s;"></i>
+        </div>
     </nav>
 
-    <!-- SCRIPTS -->
     <script src="app.js"></script>
 
 </body>
