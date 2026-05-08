@@ -1,13 +1,18 @@
 // === CONFIGURAÇÕES TÉCNICAS ======
 const API_KEY = "ada88566665b60b44b5c2b800056aa33";
-const MOTOR = "https://api-scraper-cinema.onrender.com";
+const MOTOR_APP = "https://api-scraper-cinema.onrender.com";
+const isAndroidApp = /android/i.test(navigator.userAgent || navigator.vendor || window.opera);
+
 let filmeAtual = "";
+let filmeIdAtual = ""; // Necessário para o Player Interno
 let heroIndex = 0;
+let timerBuscaApp; // Para o Debounce
 
 // ====== 1. INICIALIZAÇÃO E AUTO-HERO (FADE + INFO NO RODAPÉ) ======
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
-    document.getElementById('home').classList.add('active');
+    // Garante que os estilos do SPA (Single Page Application) comecem corretos
+    document.getElementById('home').style.display = 'block';
+    
     initHero(); 
     carregarHome();
 
@@ -23,12 +28,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000);
 });
 
-// ====== 2. BUSCA EM LISTA (FOTO + SINOPSE) ======
+// ====== 2. BUSCA EM LISTA COM DEBOUNCE ======
+function aoDigitarBuscaApp() {
+    clearTimeout(timerBuscaApp);
+    timerBuscaApp = setTimeout(buscar, 600); // Aguarda 600ms antes de chamar a API
+}
+
 async function buscar() {
     const q = document.getElementById("inputBusca").value.trim();
     if(q.length < 3) return;
+    
+    document.getElementById("resultados").innerHTML = '<p style="text-align:center; padding:20px; color:#e50914;">Buscando...</p>';
+    
     const d = await api(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=pt-BR`);
     
+    if(d.results.length === 0) {
+        document.getElementById("resultados").innerHTML = '<p style="text-align:center; padding:20px; color:#aaa;">Nenhum filme encontrado.</p>';
+        return;
+    }
+
     document.getElementById("resultados").innerHTML = d.results.map(f => `
         <div class="search-row" onclick="abrir(${f.id})" style="display:flex; gap:12px; padding:12px; border-bottom:1px solid #111; align-items:center;">
             <img src="https://image.tmdb.org/t/p/w200${f.poster_path}" onerror="this.src='https://via.placeholder.com/65x95/111/fff'" style="width:65px; height:95px; border-radius:6px; object-fit:cover; flex-shrink:0;">
@@ -64,6 +82,14 @@ async function carregarHome() {
 // ====== 4. DETALHES (SNIPER) ======
 async function abrir(id, isEmBreve = false) {
     ir('detalhes');
+    filmeIdAtual = id; // Guarda o ID globalmente para o player
+    
+    // RESET: Esconde player e botões extras antes de carregar o novo filme
+    document.getElementById('iframe-player').src = '';
+    document.getElementById('secao-player-interno').style.display = 'none';
+    document.getElementById('btn-play-externo').style.display = 'none';
+    document.getElementById('box-players-externos').style.display = 'none';
+
     const m = await api(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=pt-BR&append_to_response=videos,credits,recommendations`);
     filmeAtual = m.title.replace(/&/g, "e").replace(/[:]/g, "").replace(/[()]/g, "").trim();
 
@@ -72,50 +98,91 @@ async function abrir(id, isEmBreve = false) {
     document.getElementById('m-titulo').innerText = m.title;
     document.getElementById('m-sinopse').innerText = m.overview || "Sincronizando com o acervo...";
 
-    const btnPlay = document.getElementById('btn-play-main');
-    const boxPlayers = document.getElementById('box-players-externos');
+    const btnInterno = document.getElementById('btn-play-interno');
     const aviso = document.getElementById('aviso-embreve');
 
     if(isEmBreve) {
-        btnPlay.style.background = "#222"; btnPlay.style.color = "#555";
-        btnPlay.innerText = "ASSISTIR EM BREVE"; btnPlay.onclick = null;
-        boxPlayers.style.display = "none";
-        if(aviso) { aviso.style.display = "block"; aviso.innerText = "🍿 EM BREVE NO CINE MEGA."; }
+        btnInterno.style.display = "none";
+        if(aviso) aviso.style.display = "block";
     } else {
-        btnPlay.style.background = "var(--red)"; btnPlay.style.color = "#fff";
-        btnPlay.innerText = "ASSISTIR AGORA";
-        btnPlay.onclick = () => window.open(`${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`);
-        
-        boxPlayers.style.display = "flex";
+        btnInterno.style.display = "flex";
         if(aviso) aviso.style.display = "none";
-        
-        const motorUrl = `${MOTOR}/buscar?titulo=${encodeURIComponent(filmeAtual)}`;
-        boxPlayers.innerHTML = `
-            <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=org.videolan.vlc;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#ff8800; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">VLC</a>
-            <a href="intent://${motorUrl.replace(/^https?:\/\//, '')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/*;package=com.mxtech.videoplayer.ad;S.title=${encodeURIComponent(m.title)};end" style="text-decoration:none; width:50px; height:50px; border-radius:50%; background:#0052d4; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">MX</a>
-        `;
     }
 
     const tr = m.videos.results.find(v => v.type === "Trailer");
-    document.getElementById('m-trailer').innerHTML = tr ? `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${tr.key}" frameborder="0" allowfullscreen></iframe>` : '';
-    document.getElementById('m-elenco').innerHTML = m.credits.cast.slice(0, 8).map(c => `<div style="flex:0 0 75px; text-align:center;"><img src="https://image.tmdb.org/t/p/w200${c.profile_path}" style="width:55px; height:55px; border-radius:50%; object-fit:cover; border:2px solid var(--red);"><p style="font-size:8px; color:#999; margin-top:5px;">${c.name}</p></div>`).join('');
-    document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrir(${f.id})" style="margin-right:10px;">`).join('');
+    document.getElementById('m-trailer').innerHTML = tr ? `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${tr.key}" frameborder="0" allowfullscreen></iframe>` : '<p style="text-align:center; padding:20px; color:#555;">Trailer indisponível</p>';
+    
+    document.getElementById('m-elenco').innerHTML = m.credits.cast.slice(0, 8).map(c => `<div style="flex:0 0 75px; text-align:center;"><img src="https://image.tmdb.org/t/p/w200${c.profile_path}" onerror="this.src='https://via.placeholder.com/55?text=Ator'" style="width:55px; height:55px; border-radius:50%; object-fit:cover; border:2px solid #e50914;"><p style="font-size:9px; color:#999; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.name}</p></div>`).join('');
+    
+    document.getElementById('m-rec').innerHTML = m.recommendations.results.slice(0, 10).map(f => `<img class="card-min" src="https://image.tmdb.org/t/p/w300${f.poster_path}" onerror="this.src='https://via.placeholder.com/115x170?text=Cine'" onclick="abrir(${f.id})" style="margin-right:10px;">`).join('');
 }
 
-// ====== 5. NAVEGAÇÃO ======
+// ====== 5. NOVO SISTEMA DO PLAYER ======
+function carregarPlayerInternoApp() {
+    // Troca o botão principal pelo Iframe
+    document.getElementById('btn-play-interno').style.display = 'none';
+    document.getElementById('secao-player-interno').style.display = 'block';
+    
+    // Injeta a URL do MyEmbed
+    document.getElementById('iframe-player').src = `https://myembed.biz/filme/${filmeIdAtual}`;
+    
+    // Revela os botões do Render e Nativos
+    document.getElementById('btn-play-externo').style.display = 'block';
+    
+    // Mostra VLC/MX apenas se estiver no Android
+    if(isAndroidApp) {
+        document.getElementById('box-players-externos').style.display = 'flex';
+    }
+
+    // Configura os links com os dados recém-carregados
+    let linkRender = `${MOTOR_APP}/buscar?id=${filmeIdAtual}&titulo=${encodeURIComponent(filmeAtual)}`;
+    document.getElementById('btn-play-externo').href = linkRender;
+    
+    let linkVLC = `intent://${linkRender.replace(/https?:\/\//,'')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/mp4;package=org.videolan.vlc;end`;
+    let linkMX = `intent://${linkRender.replace(/https?:\/\//,'')}#Intent;action=android.intent.action.VIEW;scheme=http;type=video/mp4;package=com.mxtech.videoplayer.ad;end`;
+    
+    document.getElementById('btn-vlc-app').href = linkVLC;
+    document.getElementById('btn-mx-app').href = linkMX;
+}
+
+function fecharDetalhesApp() {
+    // Ao clicar na setinha de voltar, essa função limpa o iframe e volta pra home
+    document.getElementById('iframe-player').src = '';
+    document.getElementById('secao-player-interno').style.display = 'none';
+    document.getElementById('btn-play-interno').style.display = 'flex';
+    document.getElementById('btn-play-externo').style.display = 'none';
+    document.getElementById('box-players-externos').style.display = 'none';
+    ir('home'); 
+}
+
+// ====== 6. NAVEGAÇÃO E CORES ======
 function ir(p, push = true) {
     if(push) history.pushState({page: p}, '');
-    document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
-    document.getElementById(p).classList.add('active');
+    
+    // Oculta todas as páginas (display none) e mostra só a correta
+    document.querySelectorAll('.page').forEach(e => e.style.display = 'none');
+    document.getElementById(p).style.display = 'block';
     window.scrollTo(0,0);
+
+    // Gerencia a cor dos ícones na barra de baixo
+    if(document.getElementById('icon-home')) {
+        document.getElementById('icon-home').style.color = p === 'home' ? '#e50914' : '#555';
+    }
+    if(document.getElementById('icon-busca')) {
+        document.getElementById('icon-busca').style.color = p === 'buscaPage' ? '#e50914' : '#555';
+    }
 }
 
 window.addEventListener('popstate', (e) => {
     const p = (e.state && e.state.page) ? e.state.page : 'home';
+    // Se estiver voltando da tela de detalhes pelo botão nativo do celular, limpa o vídeo
+    if (document.getElementById('detalhes').style.display === 'block' && p !== 'detalhes') {
+        document.getElementById('iframe-player').src = '';
+    }
     ir(p, false);
 });
 
-// ====== 6. HERO REVISADO (INFO NO RODAPÉ + DEGRADÊ) ======
+// ====== 7. HERO REVISADO (INFO NO RODAPÉ + DEGRADÊ) ======
 async function initHero() {
     const d = await api(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=pt-BR`);
     document.getElementById('hero-wrapper').innerHTML = d.results.slice(0, 6).map((m, i) => `
@@ -134,12 +201,12 @@ async function initHero() {
                 <h2 style="margin:0 0 5px; font-size:22px; color:#fff; font-weight: bold; text-shadow: 2px 2px 5px #000;">${m.title}</h2>
                 
                 <div style="font-size:11px; color:#ffcc00; font-weight:bold; margin-bottom:6px; text-shadow: 1px 1px 3px #000;">
-                    <i class="fa fa-star"></i> ${m.vote_average.toFixed(1)} | ${m.release_date.split('-')[0]}
+                    <i class="fa fa-star"></i> ${(m.vote_average || 0).toFixed(1)} | ${m.release_date ? m.release_date.split('-')[0] : 'N/A'}
                 </div>
 
                 <p style="font-size:11px; color:#ccc; max-width:85%; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; 
                    overflow:hidden; line-height:1.4; margin:0; text-shadow: 1px 1px 3px #000;">
-                   ${m.overview}
+                   ${m.overview || 'Sinopse não disponível.'}
                 </p>
             </div>
         </div>
