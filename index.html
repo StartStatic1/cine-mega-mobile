@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cine Mega Mobile</title>
 
-    <!-- MONETAG -->
     <script src="https://quge5.com/88/tag.min.js" data-zone="238717" async data-cfasync="false"></script>
 
     <link rel="manifest" href="manifest.json">
@@ -22,16 +21,12 @@
         
         .btn-back-clean { position: absolute; top: 20px; left: 15px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; z-index: 3000; backdrop-filter: blur(5px); box-shadow: 0 2px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
 
-        .player-box-app { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 2px solid #e50914; margin: 15px 0; display: none; position: relative; z-index: 9999 !important; }
-        .player-box-app iframe { width: 100%; height: 100%; border: none; position: relative; z-index: 10000 !important; }
+        .player-box-app { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 2px solid #e50914; margin: 15px 0; display: none; }
+        .player-box-app iframe { width: 100%; height: 100%; border: none; }
 
-        /* ESCUDO: protege toda a área do player contra overlays invisíveis */
-        #secao-player-interno,
-        #btn-play-interno,
-        #btn-play-externo,
-        #box-players-externos {
+        /* Garante que cards e botões recebam clique normalmente */
+        .card, .card-top, .hero-slide, #btn-play-interno, #btn-play-externo, .btn-mini-app, .btn-back-clean, nav div {
             position: relative;
-            z-index: 9999 !important;
             pointer-events: auto !important;
         }
     </style>
@@ -109,8 +104,7 @@
             </div>
 
             <div id="secao-player-interno" class="player-box-app">
-                <!-- IFRAME COM SANDBOX - BLOQUEIA POPUPS DO SERVIDOR EXTERNO -->
-                <iframe id="iframe-player" src="" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+                <iframe id="iframe-player" src="" allowfullscreen></iframe>
             </div>
 
             <button id="btn-play-interno" class="btn-app-play" onclick="carregarPlayerInternoApp()">
@@ -152,76 +146,20 @@
 
     <script src="app.js"></script>
 
-    <!-- ESCUDO ANTI-TRAVA E ANTI-OVERLAY -->
+    <!-- SCRIPT EXTRA: apenas limpa iframe ao sair dos detalhes. NÃO interfere no app.js -->
     <script>
     (function(){
-        const iframe = document.getElementById('iframe-player');
-        const playerBox = document.getElementById('secao-player-interno');
-        const btnPlay = document.getElementById('btn-play-interno');
+        var detalhes = document.getElementById('detalhes');
+        var iframe = document.getElementById('iframe-player');
+        if(!detalhes || !iframe) return;
 
-        // 1. Garante que o iframe nasce morto (sem src)
-        if(iframe) iframe.src = '';
-
-        // 2. Intercepta carregarPlayerInternoApp para forçar sandbox antes de tudo
-        const originalCarregar = window.carregarPlayerInternoApp;
-        window.carregarPlayerInternoApp = function(){
-            if(iframe){
-                // Reforça sandbox (bloqueia popups/redirecionamentos do servidor externo)
-                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+        var obs = new MutationObserver(function(){
+            // Se a tela de detalhes foi escondida, mata o iframe para parar o ads dele
+            if(detalhes.style.display === 'none'){
+                iframe.src = '';
             }
-            if(originalCarregar) originalCarregar();
-        };
-
-        // 3. Intercepta fecharDetalhesApp para matar o iframe e parar o ads
-        const originalFechar = window.fecharDetalhesApp;
-        window.fecharDetalhesApp = function(){
-            if(iframe) iframe.src = '';
-            if(originalFechar) originalFechar();
-        };
-
-        // 4. Impede que cliques na área do player "subam" ao body (onde Monetag captura)
-        [playerBox, btnPlay].forEach(el => {
-            if(!el) return;
-            el.addEventListener('click', function(e){
-                e.stopPropagation();
-            }, true);
-            el.addEventListener('touchend', function(e){
-                e.stopPropagation();
-            }, true);
         });
-
-        // 5. MutationObserver: detecta overlays invisíveis do Monetag sobre o player e desarma
-        const observer = new MutationObserver(function(mutations){
-            // Procura por divs suspeitas (overlay invisível do ads) e tira pointer-events se estiverem sobre o player
-            const overlays = document.querySelectorAll('div[style*="position: fixed"], div[style*="position:fixed"], div[style*="z-index: 999"], div[style*="z-index:999"]');
-            overlays.forEach(div => {
-                const style = window.getComputedStyle(div);
-                const rect = div.getBoundingClientRect();
-                const playerRect = playerBox ? playerBox.getBoundingClientRect() : null;
-
-                // Se o div é transparente/invisível e cobre a tela toda ou está sobre o player
-                if(playerRect && style.pointerEvents !== 'none'){
-                    const overlap = !(rect.right < playerRect.left || 
-                                      rect.left > playerRect.right || 
-                                      rect.bottom < playerRect.top || 
-                                      rect.top > playerRect.bottom);
-                    if(overlap && (parseInt(style.zIndex) > 9000 || style.opacity === '0' || style.backgroundColor === 'rgba(0, 0, 0, 0)')){
-                        // Desarma o overlay APENAS na área do player (pointer-events none)
-                        div.style.pointerEvents = 'none';
-                    }
-                }
-            });
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        // 6. Quando o iframe carregar, tenta bloquear window.open de dentro (cross-origin, pode falhar silenciosamente)
-        if(iframe){
-            iframe.addEventListener('load', function(){
-                try {
-                    iframe.contentWindow.open = function(){ return null; };
-                } catch(e){ /* cross-origin, ignora */ }
-            });
-        }
+        obs.observe(detalhes, { attributes: true, attributeFilter: ['style'] });
     })();
     </script>
 
